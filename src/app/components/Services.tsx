@@ -176,7 +176,7 @@ export function Services() {
                 margin: 0,
               }}
             >
-              Disciplines
+              Services
               <span
                 style={{
                   color: "#FC1235",

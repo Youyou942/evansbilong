@@ -41,7 +41,7 @@ export const PROJECTS: Project[] = [
     title: "0XRUI",
     category: "Site e-commerce",
     description:
-      "Une boutique claire, pensée pour mettre l'univers en avant et rendre l'achat simple.",
+      "Enter The Sanctuary.",
     image: new URL("../../../images/Mockup 0XRUI.png", import.meta.url).href,
     pageImages: OXRUI_PAGE_IMAGES,
     gallery: [
@@ -98,7 +98,7 @@ export const PROJECTS: Project[] = [
     title: "Hyperplanning",
     category: "UX/UI · Refonte produit",
     description:
-      "Une plateforme essentielle, mais difficile à lire. Trop d'informations, pas assez de hiérarchie. La refonte vise à simplifier l'usage sans perdre la richesse fonctionnelle.",
+      "Designed for clarity.",
     image: new URL("../../../images/Mockup 1 HP.png", import.meta.url).href,
     coverImage: new URL("../../../images/Mockup 1 HP.png", import.meta.url).href,
     pageImages: HYPERPLANNING_PAGE_IMAGES,

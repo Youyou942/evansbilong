@@ -161,7 +161,7 @@ function Hero({ project }: { project: Project }) {
           {showVideoBtn && <VideoBtn onClick={() => setVideoOpen(true)} />}
           <div>
             <span style={{ fontFamily: MONO, fontSize: "0.44rem", color: "#555", letterSpacing: "0.3em", textTransform: "uppercase", display: "block", marginBottom: "0.65rem" }}>
-              {project.slug === "sundance" ? "Outils" : "Disciplines"}
+              {project.slug === "sundance" ? "Outils" : "Services"}
             </span>
             <div className="flex flex-wrap gap-1.5">
               {project.tags.map((tag) => (
