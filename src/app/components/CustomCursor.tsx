@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
+import { useLocation } from "react-router";
 
 /*
   CUSTOM CURSOR — signature brand (anneau + point rouge)
@@ -116,18 +117,24 @@ export function setCursorState(state: ExplicitState) {
   emit();
 }
 
-function getEffective(): CursorState {
-  if (_explicit !== "default") return _explicit;
+function getEffective(disableProjectState = false): CursorState {
+  const explicitState = disableProjectState && _explicit === "project"
+    ? "default"
+    : _explicit;
+
+  if (explicitState !== "default") return explicitState;
   return _autoHover ? "hover" : "default";
 }
 
-function useEffective() {
-  const [state, setState] = useState<CursorState>(getEffective());
+function useEffective(disableProjectState = false) {
+  const [state, setState] = useState<CursorState>(() => getEffective(disableProjectState));
+
   useEffect(() => {
-    const upd = () => setState(getEffective());
+    const upd = () => setState(getEffective(disableProjectState));
     _listeners.add(upd);
     return () => { _listeners.delete(upd); };
-  }, []);
+  }, [disableProjectState]);
+
   return state;
 }
 
@@ -149,11 +156,20 @@ function useIsTouch() {
    COMPOSANT
 ═══════════════════════════════════════════════════════════ */
 export function CustomCursor() {
+  const location = useLocation();
+  const isProjectDetailRoute = location.pathname.startsWith("/projects/");
   const isTouch  = useIsTouch();
   const mainRef  = useRef<HTMLDivElement>(null);
   const trailRef = useRef<HTMLDivElement>(null);
-  const state = useEffective();
+  const state = useEffective(isProjectDetailRoute);
   const spec  = SPECS[state];
+
+  useEffect(() => {
+    if (isProjectDetailRoute && _explicit === "project") {
+      _explicit = "default";
+      emit();
+    }
+  }, [isProjectDetailRoute]);
 
   /* ── Boucle RAF : position + auto-hover detection ────── */
   useEffect(() => {

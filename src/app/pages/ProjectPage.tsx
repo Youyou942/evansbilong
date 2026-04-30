@@ -83,10 +83,10 @@ export function ProjectPage() {
         <Hero project={project} />
         <OpeningShot project={project} />
         <CaseStudy project={project} />
-        {project.slug !== "sundance" && <VisualFeature project={project} />}
+        {project.slug !== "japan-airlines" && <VisualFeature project={project} />}
         {project.slug === "0xrui"
           ? <OxruiGallery project={project} />
-          : project.slug === "sundance"
+          : project.slug === "japan-airlines"
           ? <JapanGallery project={project} />
           : <GalleryPair project={project} />
         }
@@ -103,7 +103,7 @@ export function ProjectPage() {
 ═══════════════════════════════════════════════════════════ */
 function Hero({ project }: { project: Project }) {
   const showTopSiteCta = project.slug === "0xrui" && project.externalUrl === "https://0xrui.com";
-  const showVideoBtn   = project.slug === "sundance";
+  const showVideoBtn   = project.slug === "japan-airlines";
   const [videoOpen, setVideoOpen] = useState(false);
 
   return (
@@ -161,7 +161,7 @@ function Hero({ project }: { project: Project }) {
           {showVideoBtn && <VideoBtn onClick={() => setVideoOpen(true)} />}
           <div>
             <span style={{ fontFamily: MONO, fontSize: "0.44rem", color: "#555", letterSpacing: "0.3em", textTransform: "uppercase", display: "block", marginBottom: "0.65rem" }}>
-              {project.slug === "sundance" ? "Outils" : "Services"}
+              {project.slug === "japan-airlines" ? "Outils" : "Services"}
             </span>
             <div className="flex flex-wrap gap-1.5">
               {project.tags.map((tag) => (
@@ -707,7 +707,7 @@ function OxruiGallery({ project }: { project: Project }) {
 function JapanGallery({ project }: { project: Project }) {
   const imgs = getProjectPageImages(project);
   // imgs[0] = Logo Jp        (opening shot — déjà utilisé dans OpeningShot)
-  // imgs[1] = Maquette Jp    (affiché ici — VisualFeature skippé pour sundance)
+  // imgs[1] = Maquette Jp    (affiché ici — VisualFeature skippé pour japan-airlines)
   // imgs[2] = Mockup Jp
   // imgs[3] = Cards solo Jp
   // imgs[4] = Cartes jp
@@ -724,7 +724,7 @@ function JapanGallery({ project }: { project: Project }) {
 
   return (
     <div>
-      {/* ── A. Full-width : Maquette Jp (VisualFeature skippé pour sundance) ── */}
+      {/* ── A. Full-width : Maquette Jp (VisualFeature skippé pour japan-airlines) ── */}
       {maquetteJp && (
         <div
           className="mx-auto px-6 md:px-12"

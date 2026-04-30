@@ -64,7 +64,7 @@ export const PROJECTS: Project[] = [
     },
   },
   {
-    slug: "sundance",
+    slug: "japan-airlines",
     index: "02",
     title: "Japan Airlines",
     category: "Rebranding de marque",
