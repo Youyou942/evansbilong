@@ -81,46 +81,8 @@ export const JAPAN_PAGE_IMAGES: ProjectPageImage[] = [
     objectFit: "contain",
     objectPosition: "center",
   },
-  /* 07 — Slide 1 */
-  {
-    src: new URL("../../images/Slide 16_9 - 1.webp", import.meta.url).href,
-    alt: "Japan Airlines — Slide 01",
-    aspect: "16 / 9",
-    objectFit: "contain",
-    objectPosition: "center",
-  },
-  /* 08 — Slide 2 */
-  {
-    src: new URL("../../images/Slide 16_9 - 2.webp", import.meta.url).href,
-    alt: "Japan Airlines — Slide 02",
-    aspect: "16 / 9",
-    objectFit: "contain",
-    objectPosition: "center",
-  },
-  /* 09 — Panneau Japan */
-  {
-    src: new URL("../../images/panneau japan 3.webp", import.meta.url).href,
-    alt: "Japan Airlines — Panneau",
-    aspect: "16 / 9",
-    objectFit: "cover",
-    objectPosition: "center",
-  },
-  /* 10 — Desktop 9 */
-  {
-    src: new URL("../../images/Desktop - 9.webp", import.meta.url).href,
-    alt: "Japan Airlines — Desktop 09",
-    aspect: "16 / 9",
-    objectFit: "contain",
-    objectPosition: "center",
-  },
-  /* 11 — Desktop 16 */
-  {
-    src: new URL("../../images/Desktop - 16.webp", import.meta.url).href,
-    alt: "Japan Airlines — Desktop 16",
-    aspect: "16 / 9",
-    objectFit: "contain",
-    objectPosition: "center",
-  },
+  /* Les exports répétés (slides / panneau / desktops) ont été retirés :
+     ils réutilisaient exactement les mêmes visuels déjà présents plus haut. */
 ];
 
 export const HYPERPLANNING_PAGE_IMAGES: ProjectPageImage[] = [

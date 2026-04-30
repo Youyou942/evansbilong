@@ -207,9 +207,35 @@ export function Services() {
         </div>
 
         {/* ══════════════════════════════════════════════════════
-            CORPS — Panneau gauche (sticky) + Index à droite
+            MOBILE — Cartes verticales empilées (< lg)
         ══════════════════════════════════════════════════════ */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
+        <div className="lg:hidden flex flex-col gap-4 sm:gap-5">
+          {SERVICES.map((service, i) => (
+            <MobileServiceCard
+              key={service.id}
+              service={service}
+              index={i}
+              inView={inView}
+            />
+          ))}
+          {/* Mention bas de liste */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={inView ? { opacity: 1 } : {}}
+            transition={{ duration: 1, delay: 0.9, ease: EASE }}
+            className="mt-8 flex items-center gap-3"
+          >
+            <div style={{ width: "14px", height: "1px", backgroundColor: "rgba(255,255,255,0.12)" }} />
+            <span style={{ fontFamily: MONO, fontSize: "0.46rem", color: "#4A4A4A", letterSpacing: "0.32em", textTransform: "uppercase" }}>
+              {`0${SERVICES.length}`} disciplines · Sur-mesure uniquement
+            </span>
+          </motion.div>
+        </div>
+
+        {/* ══════════════════════════════════════════════════════
+            DESKTOP — Panneau gauche (sticky) + Index à droite
+        ══════════════════════════════════════════════════════ */}
+        <div className="hidden lg:grid lg:grid-cols-12 gap-10 lg:gap-16 items-start">
 
           {/* ── Panneau gauche : numéro géant + fiche méta ── */}
           <div className="lg:col-span-5 lg:sticky lg:top-32">
@@ -597,5 +623,211 @@ function ServiceRow({
         </div>
       </div>
     </motion.li>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════
+   CARTE MOBILE — layout vertical premium (< lg)
+   Chaque service = un bloc autonome avec :
+   - index rouge en mono
+   - titre grand et lisible
+   - discipline en micro-typographie
+   - résumé toujours visible
+   - ligne rouge en haut au tap
+══════════════════════════════════════════════════════════ */
+function MobileServiceCard({
+  service,
+  index: i,
+  inView,
+}: {
+  service: Service;
+  index: number;
+  inView: boolean;
+}) {
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 24 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.7, delay: 0.2 + i * 0.09, ease: EASE }}
+      whileTap={{ scale: 0.988 }}
+      style={{
+        position: "relative",
+        overflow: "hidden",
+        border: "1px solid rgba(255,255,255,0.08)",
+        borderRadius: "22px",
+        padding: "clamp(1.2rem, 5vw, 1.55rem)",
+        background:
+          "linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.015) 100%)",
+        boxShadow: "0 18px 50px rgba(0,0,0,0.22)",
+        WebkitTapHighlightColor: "transparent",
+      }}
+    >
+      {/* Accent rouge discret */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          top: 0,
+          left: "clamp(1.2rem, 5vw, 1.55rem)",
+          height: "1px",
+          width: "40px",
+          backgroundColor: "#FC1235",
+          boxShadow: "0 0 14px rgba(252,18,53,0.28)",
+        }}
+      />
+
+      <div
+        aria-hidden="true"
+        className="absolute right-5 top-5 rounded-full"
+        style={{
+          width: "6px",
+          height: "6px",
+          backgroundColor: "rgba(252,18,53,0.72)",
+          boxShadow: "0 0 16px rgba(252,18,53,0.24)",
+        }}
+      />
+
+      {/* En-tête : index + discipline */}
+      <div className="mb-5 flex flex-col gap-3">
+        <div className="flex items-center justify-between gap-4">
+          <span
+            style={{
+              fontFamily: MONO,
+              fontSize: "0.52rem",
+              letterSpacing: "0.32em",
+              color: "#FC1235",
+              lineHeight: 1,
+            }}
+          >
+            {service.index}
+          </span>
+          <div className="flex items-center gap-2.5 shrink-0">
+            <div style={{ width: "12px", height: "1px", backgroundColor: "rgba(252,18,53,0.5)" }} />
+            <span
+              style={{
+                fontFamily: MONO,
+                fontSize: "0.42rem",
+                letterSpacing: "0.28em",
+                textTransform: "uppercase",
+                color: "#4A4A4A",
+                lineHeight: 1,
+              }}
+            >
+              Service
+            </span>
+          </div>
+        </div>
+
+        <span
+          style={{
+            fontFamily: MONO,
+            fontSize: "0.46rem",
+            letterSpacing: "0.22em",
+            textTransform: "uppercase",
+            color: "#6B6B6B",
+            lineHeight: 1.6,
+            display: "block",
+            maxWidth: "30ch",
+            overflowWrap: "anywhere",
+          }}
+        >
+          {service.discipline}
+        </span>
+      </div>
+
+      {/* Titre — grand, lisible, fort */}
+      <h3
+        style={{
+          fontFamily: SANS,
+          fontSize: "clamp(2rem, 8.6vw, 2.75rem)",
+          fontWeight: 700,
+          letterSpacing: "-0.04em",
+          lineHeight: 0.98,
+          color: "rgba(255,255,255,0.96)",
+          margin: "0 0 0.95rem 0",
+        }}
+      >
+        {service.title}
+        <span
+          aria-hidden="true"
+          style={{
+            display: "inline-block",
+            marginLeft: "0.18em",
+            color: "#FC1235",
+            opacity: 1,
+          }}
+        >
+          .
+        </span>
+      </h3>
+
+      {/* Séparateur fin */}
+      <div
+        style={{
+          height: "1px",
+          backgroundColor: "rgba(255,255,255,0.06)",
+          marginBottom: "1rem",
+        }}
+      />
+
+      {/* Résumé — toujours visible sur mobile */}
+      <p
+        style={{
+          fontFamily: SANS,
+          fontSize: "clamp(0.98rem, 4vw, 1.02rem)",
+          lineHeight: 1.75,
+          color: "#9A9A9A",
+          letterSpacing: "-0.01em",
+          margin: "0 0 1.35rem 0",
+        }}
+      >
+        {service.summary}
+      </p>
+
+      {/* Méta — contenu complet, lisible en pile */}
+      <div
+        style={{
+          borderTop: "1px solid rgba(255,255,255,0.06)",
+          paddingTop: "1rem",
+          display: "grid",
+          gap: "0.8rem",
+        }}
+      >
+        <MobileMetaRow label="Livrable" value={service.meta.output} />
+        <MobileMetaRow label="Outils" value={service.meta.tools} />
+        <MobileMetaRow label="Délai" value={service.meta.delivery} />
+      </div>
+    </motion.article>
+  );
+}
+
+function MobileMetaRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span
+        style={{
+          fontFamily: MONO,
+          fontSize: "0.42rem",
+          color: "#555",
+          letterSpacing: "0.3em",
+          textTransform: "uppercase",
+          lineHeight: 1,
+        }}
+      >
+        {label}
+      </span>
+      <span
+        style={{
+          fontFamily: SANS,
+          fontSize: "0.92rem",
+          color: "#D4D4D4",
+          lineHeight: 1.55,
+          letterSpacing: "-0.01em",
+          overflowWrap: "anywhere",
+        }}
+      >
+        {value}
+      </span>
+    </div>
   );
 }

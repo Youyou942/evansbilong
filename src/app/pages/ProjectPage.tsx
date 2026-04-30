@@ -695,74 +695,58 @@ function OxruiGallery({ project }: { project: Project }) {
 
 /* ═══════════════════════════════════════════════════════════
    ⑤-ter JAPAN GALLERY — layout éditorial Japan Airlines
-   Structure :
-     A. Full-width : Mockup Jp (device)
-     B. Duo 2 col  : Cards solo + Cartes jp
-     C. Full-width : Chartes graphiques
-     D. Duo 2 col  : Variantes logo + Slide 1
-     E. Full-width : Slide 2
-     F. Duo 2 col  : Panneau + Desktop 9
-     G. Full-width : Desktop 16
+   Flux conservé :
+     A. Full-width : Maquette homepage
+     B. Full-width : Mockup device
+     C. Duo 2 col  : Cards solo + Cartes jp
+     D. Full-width : Chartes graphiques
+     E. Full-width : Variantes logo
+   Les exports dupliqués ont été retirés à la source pour éviter
+   toute répétition visuelle plus bas dans la page.
 ═══════════════════════════════════════════════════════════ */
 function JapanGallery({ project }: { project: Project }) {
   const imgs = getProjectPageImages(project);
-  // imgs[0] = Logo Jp        (opening shot — déjà utilisé)
-  // imgs[1] = Maquette Jp    (VisualFeature — déjà utilisé)
+  // imgs[0] = Logo Jp        (opening shot — déjà utilisé dans OpeningShot)
+  // imgs[1] = Maquette Jp    (affiché ici — VisualFeature skippé pour sundance)
   // imgs[2] = Mockup Jp
   // imgs[3] = Cards solo Jp
   // imgs[4] = Cartes jp
   // imgs[5] = Chartes Jp
   // imgs[6] = Variantes logo
-  // imgs[7] = Slide 1
-  // imgs[8] = Slide 2
-  // imgs[9] = Panneau japan
-  // imgs[10] = Desktop - 9
-  // imgs[11] = Desktop - 16
+  const maquetteJp   = imgs[1];
   const mockupJp     = imgs[2];
   const cardsSolo    = imgs[3];
   const cartesJp     = imgs[4];
   const chartesJp    = imgs[5];
   const variantesLogo = imgs[6];
-  const slide1       = imgs[7];
-  const slide2       = imgs[8];
-  const panneau      = imgs[9];
-  const desktop9     = imgs[10];
-  const desktop16    = imgs[11];
-
-  const refA = useRef<HTMLDivElement>(null);
-  const refB = useRef<HTMLDivElement>(null);
-  const refC = useRef<HTMLDivElement>(null);
-  const refD = useRef<HTMLDivElement>(null);
-  const refE = useRef<HTMLDivElement>(null);
-  const refF = useRef<HTMLDivElement>(null);
-  const refG = useRef<HTMLDivElement>(null);
-  const inViewA = useInView(refA, { once: true, margin: "-8%" });
-  const inViewB = useInView(refB, { once: true, margin: "-8%" });
-  const inViewC = useInView(refC, { once: true, margin: "-8%" });
-  const inViewD = useInView(refD, { once: true, margin: "-8%" });
-  const inViewE = useInView(refE, { once: true, margin: "-8%" });
-  const inViewF = useInView(refF, { once: true, margin: "-8%" });
-  const inViewG = useInView(refG, { once: true, margin: "-8%" });
 
   const gap = "clamp(3rem, 6vw, 5rem)";
 
   return (
     <div>
-      {/* ── A. Full-width : Mockup Jp ── */}
-      {mockupJp && (
+      {/* ── A. Full-width : Maquette Jp (VisualFeature skippé pour sundance) ── */}
+      {maquetteJp && (
         <div
-          ref={refA}
           className="mx-auto px-6 md:px-12"
           style={{ maxWidth: "1400px", paddingTop: gap, marginBottom: gap }}
+        >
+          <NaturalImage image={maquetteJp} direction="left" delay={0} />
+        </div>
+      )}
+
+      {/* ── B. Full-width : Mockup Jp ── */}
+      {mockupJp && (
+        <div
+          className="mx-auto px-6 md:px-12"
+          style={{ maxWidth: "1400px", marginBottom: gap }}
         >
           <NaturalImage image={mockupJp} direction="left" delay={0} />
         </div>
       )}
 
-      {/* ── B. Duo 2 col : Cards solo + Cartes jp ── */}
+      {/* ── C. Duo 2 col : Cards solo + Cartes jp ── */}
       {(cardsSolo || cartesJp) && (
         <div
-          ref={refB}
           className="mx-auto px-6 md:px-12"
           style={{ maxWidth: "1400px", marginBottom: gap }}
         >
@@ -781,10 +765,9 @@ function JapanGallery({ project }: { project: Project }) {
         </div>
       )}
 
-      {/* ── C. Full-width : Chartes graphiques ── */}
+      {/* ── D. Full-width : Chartes graphiques ── */}
       {chartesJp && (
         <div
-          ref={refC}
           className="mx-auto px-6 md:px-12"
           style={{ maxWidth: "1400px", marginBottom: gap }}
         >
@@ -792,69 +775,13 @@ function JapanGallery({ project }: { project: Project }) {
         </div>
       )}
 
-      {/* ── D. Duo 2 col : Variantes logo + Slide 1 ── */}
-      {(variantesLogo || slide1) && (
+      {/* ── E. Full-width : Variantes logo ── */}
+      {variantesLogo && (
         <div
-          ref={refD}
-          className="mx-auto px-6 md:px-12"
-          style={{ maxWidth: "1400px", marginBottom: gap }}
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
-            {variantesLogo && (
-              <div>
-                <NaturalImage image={variantesLogo} direction="left" delay={0} />
-              </div>
-            )}
-            {slide1 && (
-              <div className="md:pt-12">
-                <NaturalImage image={slide1} direction="right" delay={0.12} />
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* ── E. Full-width : Slide 2 ── */}
-      {slide2 && (
-        <div
-          ref={refE}
-          className="mx-auto px-6 md:px-12"
-          style={{ maxWidth: "1400px", marginBottom: gap }}
-        >
-          <NaturalImage image={slide2} direction="left" delay={0} />
-        </div>
-      )}
-
-      {/* ── F. Duo 2 col : Panneau + Desktop 9 ── */}
-      {(panneau || desktop9) && (
-        <div
-          ref={refF}
-          className="mx-auto px-6 md:px-12"
-          style={{ maxWidth: "1400px", marginBottom: gap }}
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
-            {panneau && (
-              <div>
-                <NaturalImage image={panneau} direction="left" delay={0} />
-              </div>
-            )}
-            {desktop9 && (
-              <div className="md:pt-12">
-                <NaturalImage image={desktop9} direction="right" delay={0.12} />
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* ── G. Full-width : Desktop 16 ── */}
-      {desktop16 && (
-        <div
-          ref={refG}
           className="mx-auto px-6 md:px-12"
           style={{ maxWidth: "1400px", paddingBottom: "clamp(6rem, 12vw, 10rem)" }}
         >
-          <NaturalImage image={desktop16} direction="left" delay={0} />
+          <NaturalImage image={variantesLogo} direction="left" delay={0} />
         </div>
       )}
     </div>
