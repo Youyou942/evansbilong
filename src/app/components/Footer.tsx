@@ -153,6 +153,75 @@ function PrimaryCTA() {
   );
 }
 
+function DownloadCVCTA() {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <motion.a
+      href="/CV%20Evans%20Bilong.pdf"
+      download="CV Evans Bilong.pdf"
+      aria-label="Télécharger mon CV au format PDF"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="group inline-flex items-center gap-3 self-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FC1235] focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+      whileTap={{ scale: 0.985 }}
+      style={{
+        textDecoration: "none",
+        backgroundColor: hovered ? "rgba(252,18,53,0.12)" : "rgba(255,255,255,0.03)",
+        color: hovered ? "#FFFFFF" : "#F3F3F3",
+        padding: "0.9rem clamp(1.25rem, 4vw, 1.55rem) 0.9rem clamp(1.4rem, 4vw, 1.8rem)",
+        borderRadius: "9999px",
+        border: hovered
+          ? "1px solid rgba(252,18,53,0.45)"
+          : "1px solid rgba(255,255,255,0.1)",
+        boxShadow: hovered
+          ? "0 14px 34px rgba(252,18,53,0.16), 0 0 0 1px rgba(252,18,53,0.16)"
+          : "0 10px 26px rgba(0,0,0,0.32)",
+        transition:
+          "background-color 0.35s cubic-bezier(0.22, 1, 0.36, 1), color 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1)",
+      }}
+    >
+      <span
+        style={{
+          fontFamily: SANS,
+          fontSize: "clamp(0.9rem, 2.2vw, 0.95rem)",
+          fontWeight: 600,
+          letterSpacing: "-0.01em",
+          lineHeight: 1,
+        }}
+      >
+        Télécharger mon CV
+      </span>
+      <span
+        aria-hidden="true"
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: "26px",
+          height: "26px",
+          borderRadius: "9999px",
+          backgroundColor: hovered ? "#FC1235" : "rgba(252,18,53,0.18)",
+          color: "#FFFFFF",
+          transform: hovered ? "translateY(2px)" : "translateY(0)",
+          transition:
+            "background-color 0.35s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1)",
+        }}
+      >
+        <svg width="11" height="11" viewBox="0 0 13 13" fill="none">
+          <path
+            d="M6.5 1.5V8.5M6.5 8.5L3.75 5.75M6.5 8.5L9.25 5.75M2 11H11"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </span>
+    </motion.a>
+  );
+}
+
 /* ═══════════════════════════════════════════════════════════
    COMPOSANT PRINCIPAL
 ═══════════════════════════════════════════════════════════ */
@@ -262,8 +331,9 @@ export function Footer() {
             </p>
 
             {/* CTA + email côte-à-côte */}
-            <div className="mt-8 sm:mt-10 flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-8">
+            <div className="mt-8 sm:mt-10 flex flex-col items-start gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-5 lg:gap-8">
               <PrimaryCTA />
+              <DownloadCVCTA />
 
               {/* Email en "secondary link" */}
               <a
