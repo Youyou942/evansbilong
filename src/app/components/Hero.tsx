@@ -47,7 +47,7 @@ export function Hero() {
     },
     {
       key: "detail",
-      content: <>Chaque détail –</>,
+      content: <>Chaque détail</>,
       delay: 0.34,
     },
     {
@@ -173,9 +173,10 @@ export function Hero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1.6, delay: 0.7, ease: SOFT_OUT }}
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-20 overflow-hidden hidden md:block"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-20 hidden overflow-hidden md:flex md:items-end md:justify-center"
         style={{
           height: "clamp(72px, 14vw, 190px)",
+          paddingInline: "clamp(1rem, 3vw, 3.5rem)",
           WebkitMaskImage:
             "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 35%, rgba(0,0,0,0.4) 65%, rgba(0,0,0,0) 100%)",
           maskImage:
@@ -183,16 +184,17 @@ export function Hero() {
         }}
       >
         <p
-          className="absolute bottom-0 left-1/2 whitespace-nowrap leading-none"
+          className="w-full max-w-full text-center whitespace-nowrap leading-none"
           style={{
             fontFamily: DOTO,
             fontWeight: 400,
-            fontSize: "clamp(2.8rem, 18vw, 191.1px)",
+            fontSize: "clamp(2.8rem, calc((100vw - 3rem) / 14), 11rem)",
             color: "#FC1235",
             opacity: 0.92,
             letterSpacing: "0.04em",
             lineHeight: 1,
-            transform: "translateX(-50%)",
+            margin: 0,
+            maxWidth: "100%",
           }}
         >
           EVANS BILONG
