@@ -88,10 +88,11 @@ function CustomSlider({ value, onChange, className, ariaLabel }: CustomSliderPro
 
 type VideoPlayerProps = {
   src: string;
+  fallbackSrc?: string;
   className?: string;
 };
 
-export function VideoPlayer({ src, className }: VideoPlayerProps) {
+export function VideoPlayer({ src, fallbackSrc, className }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const previousVolumeRef = useRef(1);
 
@@ -107,6 +108,8 @@ export function VideoPlayer({ src, className }: VideoPlayerProps) {
     if (typeof window === "undefined") return false;
     return window.matchMedia(MOBILE_BREAKPOINT_QUERY).matches;
   });
+
+  const useNativeControls = isMobileViewport;
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -125,7 +128,7 @@ export function VideoPlayer({ src, className }: VideoPlayerProps) {
     return () => mediaQuery.removeListener(updateViewport);
   }, []);
 
-  const controlsVisible = isMobileViewport || showControls || !isPlaying;
+  const controlsVisible = !useNativeControls && (showControls || !isPlaying);
 
   const togglePlay = async () => {
     const video = videoRef.current;
@@ -232,14 +235,17 @@ export function VideoPlayer({ src, className }: VideoPlayerProps) {
       <div className="relative w-full bg-black" style={{ aspectRatio: "16 / 9", maxHeight: isMobileViewport ? "75dvh" : undefined }}>
         <video
           ref={videoRef}
-          src={src}
           className="h-full w-full bg-black object-contain"
+          controls={useNativeControls}
+          autoPlay={false}
           playsInline
           preload="metadata"
-          style={{ width: "100%", height: "100%", objectFit: "contain" }}
+          style={{ width: "100%", height: useNativeControls ? "auto" : "100%", maxHeight: isMobileViewport ? "75dvh" : undefined, objectFit: "contain" }}
           onClick={() => {
-            setShowControls(true);
-            void togglePlay();
+            if (!useNativeControls) {
+              setShowControls(true);
+              void togglePlay();
+            }
           }}
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
@@ -250,9 +256,14 @@ export function VideoPlayer({ src, className }: VideoPlayerProps) {
           onLoadedMetadata={handleTimeUpdate}
           onTimeUpdate={handleTimeUpdate}
           onDurationChange={handleTimeUpdate}
-        />
+        >
+          <source src={src} type="video/webm" />
+          {fallbackSrc ? <source src={fallbackSrc} type="video/mp4" /> : null}
+        </video>
 
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.12),transparent_28%,transparent_66%,rgba(0,0,0,0.72))]" />
+        {!useNativeControls && (
+          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.12),transparent_28%,transparent_66%,rgba(0,0,0,0.72))]" />
+        )}
 
         <AnimatePresence>
           {controlsVisible && (

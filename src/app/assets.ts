@@ -24,6 +24,11 @@ export const JAPAN_VIDEO = new URL(
   import.meta.url,
 ).href;
 
+export const JAPAN_VIDEO_MP4 = new URL(
+  "../../images/japan airlines vid_1.mp4",
+  import.meta.url,
+).href;
+
 export const JAPAN_PAGE_IMAGES: ProjectPageImage[] = [
   /* 00 — Logo (opening shot, plein format) */
   {

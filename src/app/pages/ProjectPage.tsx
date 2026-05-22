@@ -10,7 +10,7 @@ import {
 import { getProjectBySlug, getAdjacentProjects, PROJECTS } from "../data/projects";
 import type { Project } from "../data/projects";
 import type { ProjectPageImage } from "../assets";
-import { JAPAN_VIDEO } from "../assets";
+import { JAPAN_VIDEO, JAPAN_VIDEO_MP4 } from "../assets";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { StickyNav } from "../components/StickyNav";
 import { CustomCursor, setCursorState } from "../components/CustomCursor";
@@ -110,7 +110,14 @@ function Hero({ project }: { project: Project }) {
 
   return (
     <>
-    {showVideoBtn && <VideoModal open={videoOpen} onClose={() => setVideoOpen(false)} src={JAPAN_VIDEO} />}
+    {showVideoBtn && (
+      <VideoModal
+        open={videoOpen}
+        onClose={() => setVideoOpen(false)}
+        src={JAPAN_VIDEO}
+        fallbackSrc={JAPAN_VIDEO_MP4}
+      />
+    )}
     <section
       className="mx-auto px-6 md:px-12"
       style={{ maxWidth: "1400px", paddingTop: "clamp(7rem, 14vw, 11rem)", paddingBottom: "clamp(4rem, 8vw, 6rem)" }}
@@ -237,7 +244,17 @@ function VideoBtn({ onClick }: { onClick: () => void }) {
 }
 
 /* ─── Modal vidéo ────────────────────────────────────────── */
-function VideoModal({ open, onClose, src }: { open: boolean; onClose: () => void; src: string }) {
+function VideoModal({
+  open,
+  onClose,
+  src,
+  fallbackSrc,
+}: {
+  open: boolean;
+  onClose: () => void;
+  src: string;
+  fallbackSrc?: string;
+}) {
   /* Fermer avec Escape */
   useEffect(() => {
     if (!open) return;
@@ -246,12 +263,28 @@ function VideoModal({ open, onClose, src }: { open: boolean; onClose: () => void
     return () => window.removeEventListener("keydown", handler);
   }, [open, onClose]);
 
+  useEffect(() => {
+    if (!open || typeof document === "undefined") return;
+
+    const { body, documentElement } = document;
+    const previousBodyOverflow = body.style.overflow;
+    const previousHtmlOverflow = documentElement.style.overflow;
+
+    body.style.overflow = "hidden";
+    documentElement.style.overflow = "hidden";
+
+    return () => {
+      body.style.overflow = previousBodyOverflow;
+      documentElement.style.overflow = previousHtmlOverflow;
+    };
+  }, [open]);
+
   if (!open) return null;
 
   return (
     <div
       className="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto"
-      style={{ backgroundColor: "rgba(0,0,0,0.88)", backdropFilter: "blur(6px)" }}
+      style={{ backgroundColor: "rgba(0,0,0,0.88)", backdropFilter: "blur(6px)", minHeight: "100dvh", overscrollBehavior: "contain" }}
       onClick={onClose}
     >
       <div
@@ -276,7 +309,7 @@ function VideoModal({ open, onClose, src }: { open: boolean; onClose: () => void
           </span>
         </button>
 
-        <VideoPlayer src={src} />
+        <VideoPlayer src={src} fallbackSrc={fallbackSrc} />
       </div>
     </div>
   );

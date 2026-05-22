@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
+import { ContactAnimatedCard } from "../components/ContactAnimatedCard";
 import { Footer } from "../components/Footer";
 import { StickyNav } from "../components/StickyNav";
 import { CustomCursor, setCursorState } from "../components/CustomCursor";
@@ -451,49 +452,40 @@ export function ContactPage() {
           />
 
           <div className="relative z-10 mx-auto px-5 sm:px-6 md:px-10 lg:px-12" style={{ maxWidth: "960px" }}>
-            <div
-              className="mx-auto w-full max-w-[720px]"
-              style={{
-                borderRadius: "28px",
-                border: "1px solid rgba(255,255,255,0.08)",
-                background: "linear-gradient(180deg, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0.012) 100%)",
-                boxShadow: "0 30px 80px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.03)",
-                backdropFilter: "blur(10px)",
-                WebkitBackdropFilter: "blur(10px)",
-                padding: "clamp(1.5rem, 4vw, 2.5rem)",
-              }}
-            >
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem", marginBottom: "clamp(1.5rem, 3vw, 2rem)" }}>
-                <span
-                  style={{
-                    fontFamily: MONO,
-                    fontSize: "0.5rem",
-                    color: ACCENT,
-                    letterSpacing: "0.34em",
-                    textTransform: "uppercase",
-                    lineHeight: 1,
-                  }}
-                >
-                  Contact
-                </span>
-                <h1
-                  style={{
-                    margin: 0,
-                    fontFamily: SANS,
-                    fontSize: "clamp(2.2rem, 6vw, 4rem)",
-                    fontWeight: 700,
-                    lineHeight: 0.96,
-                    letterSpacing: "-0.05em",
-                    color: "#FFFFFF",
-                  }}
-                >
-                  Parlons de votre projet
-                </h1>
-              </div>
+            <ContactAnimatedCard className="mx-auto w-full max-w-[720px]">
+              <div style={{ padding: "clamp(1.5rem, 4vw, 2.5rem)" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem", marginBottom: "clamp(1.5rem, 3vw, 2rem)" }}>
+                  <span
+                    style={{
+                      fontFamily: MONO,
+                      fontSize: "0.5rem",
+                      color: ACCENT,
+                      letterSpacing: "0.34em",
+                      textTransform: "uppercase",
+                      lineHeight: 1,
+                    }}
+                  >
+                    Contact
+                  </span>
+                  <h1
+                    style={{
+                      margin: 0,
+                      fontFamily: SANS,
+                      fontSize: "clamp(2.2rem, 6vw, 4rem)",
+                      fontWeight: 700,
+                      lineHeight: 0.96,
+                      letterSpacing: "-0.05em",
+                      color: "#FFFFFF",
+                    }}
+                  >
+                    Parlons de votre projet
+                  </h1>
+                </div>
 
-              <ContactForm />
-              <PricingBlock />
-            </div>
+                <ContactForm />
+                <PricingBlock />
+              </div>
+            </ContactAnimatedCard>
           </div>
         </section>
       </main>
