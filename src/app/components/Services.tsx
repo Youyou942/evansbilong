@@ -187,23 +187,6 @@ export function Services() {
               </span>
             </motion.h2>
           </div>
-
-          {/* Colonne descriptive — discrète, à droite du titre */}
-          <motion.p
-            initial={{ opacity: 0, y: 18 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7, delay: 0.18, ease: EASE }}
-            className="max-w-sm lg:ml-auto lg:text-right"
-            style={{
-              fontFamily: SANS,
-              fontSize: "clamp(0.92rem, 1.8vw, 0.95rem)",
-              lineHeight: 1.75,
-              color: "#5A5A5A",
-              margin: 0,
-            }}
-          >
-            Chaque projet demande le bon format. Le but reste le même : un site clair, juste et efficace.
-          </motion.p>
         </div>
 
         {/* ══════════════════════════════════════════════════════
@@ -218,18 +201,6 @@ export function Services() {
               inView={inView}
             />
           ))}
-          {/* Mention bas de liste */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={inView ? { opacity: 1 } : {}}
-            transition={{ duration: 1, delay: 0.9, ease: EASE }}
-            className="mt-8 flex items-center gap-3"
-          >
-            <div style={{ width: "14px", height: "1px", backgroundColor: "rgba(255,255,255,0.12)" }} />
-            <span style={{ fontFamily: MONO, fontSize: "0.46rem", color: "#4A4A4A", letterSpacing: "0.32em", textTransform: "uppercase" }}>
-              {`0${SERVICES.length}`} disciplines · Sur-mesure uniquement
-            </span>
-          </motion.div>
         </div>
 
         {/* ══════════════════════════════════════════════════════
@@ -260,33 +231,6 @@ export function Services() {
                 />
               ))}
             </ul>
-
-            {/* Petite mention de bas de liste — style éditorial */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={inView ? { opacity: 1 } : {}}
-              transition={{ duration: 1, delay: 0.9, ease: EASE }}
-              className="mt-10 flex items-center gap-3"
-            >
-              <div
-                style={{
-                  width: "14px",
-                  height: "1px",
-                  backgroundColor: "rgba(255,255,255,0.12)",
-                }}
-              />
-              <span
-                style={{
-                  fontFamily: MONO,
-                  fontSize: "0.46rem",
-                  color: "#4A4A4A",
-                  letterSpacing: "0.32em",
-                  textTransform: "uppercase",
-                }}
-              >
-                {`0${SERVICES.length}`} disciplines · Sur-mesure uniquement
-              </span>
-            </motion.div>
           </div>
         </div>
       </div>

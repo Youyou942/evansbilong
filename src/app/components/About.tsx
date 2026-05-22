@@ -11,6 +11,7 @@ const EASE  = [0.22, 1, 0.36, 1] as const;
 const TOOLS = [
   { name: "Figma",         tag: "UI · UX · Prototypage" },
   { name: "Shopify",       tag: "E-commerce · Liquid" },
+  { name: "VS Code",       tag: "Éditeur · Front-end · Dev" },
   { name: "Adobe Suite",   tag: "Photoshop · Illustrator · Ae" },
   { name: "WordPress",     tag: "CMS · Elementor · ACF" },
 ];
@@ -112,10 +113,7 @@ export function About() {
                 margin: 0,
               }}
             >
-              Les bons outils.{" "}
-              <span style={{ color: "#FC1235", textShadow: "0 0 30px rgba(252,18,53,0.2)" }}>
-                Un résultat solide.
-              </span>
+              Mes outils
             </h2>
             <p
               className="mt-4"
@@ -127,7 +125,7 @@ export function About() {
                 maxWidth: "38ch",
               }}
             >
-              Je choisis les outils selon le projet. L'objectif est simple : aller à l'essentiel et obtenir un résultat clair, fiable et durable.
+              Les logiciels que j’utilise pour concevoir, structurer et donner vie à mes projets.
             </p>
           </motion.div>
         </div>
