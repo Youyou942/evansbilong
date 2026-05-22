@@ -13,6 +13,12 @@ const FORMSPREE_ENDPOINT = (
   ((import.meta as unknown as { env?: Record<string, string | undefined> }).env?.VITE_FORMSPREE_ENDPOINT) ?? ""
 ).trim();
 
+const PRICING_ITEMS = [
+  { label: "Landing page", price: "à partir de 600 €" },
+  { label: "Site vitrine", price: "à partir de 1 000 €" },
+  { label: "Shopify / e-commerce", price: "à partir de 1 500 €" },
+] as const;
+
 type FormValues = {
   nom: string;
   email: string;
@@ -24,6 +30,111 @@ type FormErrors = Partial<Record<keyof FormValues, string>>;
 function buildMailtoUrl({ nom, email, message }: FormValues) {
   const body = encodeURIComponent(`Nom : ${nom}\nEmail : ${email}\n\nMessage :\n${message}`);
   return `mailto:bilongevans@gmail.com?subject=${encodeURIComponent(MAIL_SUBJECT)}&body=${body}`;
+}
+
+function PricingBlock() {
+  return (
+    <section
+      aria-label="Tarifs indicatifs"
+      style={{
+        marginTop: "clamp(1.75rem, 4vw, 2.5rem)",
+        paddingTop: "clamp(1.35rem, 3vw, 1.8rem)",
+        borderTop: "1px solid rgba(255,255,255,0.08)",
+        display: "flex",
+        flexDirection: "column",
+        gap: "1rem",
+      }}
+    >
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.7rem" }}>
+        <h2
+          style={{
+            margin: 0,
+            fontFamily: MONO,
+            fontSize: "0.58rem",
+            color: ACCENT,
+            letterSpacing: "0.3em",
+            textTransform: "uppercase",
+            lineHeight: 1.4,
+          }}
+        >
+          Tarifs indicatifs
+        </h2>
+        <p
+          style={{
+            margin: 0,
+            fontFamily: SANS,
+            fontSize: "clamp(0.96rem, 2.2vw, 1rem)",
+            lineHeight: 1.7,
+            color: "#969696",
+            maxWidth: "58ch",
+            letterSpacing: "-0.01em",
+          }}
+        >
+          Chaque projet dépend du besoin, du niveau de personnalisation et du nombre de pages.
+        </p>
+      </div>
+
+      <div
+        style={{
+          borderRadius: "22px",
+          border: "1px solid rgba(255,255,255,0.07)",
+          background: "linear-gradient(180deg, rgba(255,255,255,0.022) 0%, rgba(255,255,255,0.01) 100%)",
+          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.02)",
+          padding: "clamp(1rem, 3vw, 1.35rem)",
+        }}
+      >
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.15rem" }}>
+          {PRICING_ITEMS.map((item, index) => (
+            <div
+              key={item.label}
+              className="flex flex-col gap-1.5 py-3 sm:flex-row sm:items-center sm:justify-between"
+              style={{
+                borderBottom: index < PRICING_ITEMS.length - 1 ? "1px solid rgba(255,255,255,0.06)" : "none",
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: SANS,
+                  fontSize: "clamp(0.98rem, 2.2vw, 1.02rem)",
+                  fontWeight: 500,
+                  color: "#F2F2F2",
+                  letterSpacing: "-0.015em",
+                  lineHeight: 1.4,
+                }}
+              >
+                {item.label}
+              </span>
+              <span
+                style={{
+                  fontFamily: MONO,
+                  fontSize: "0.5rem",
+                  color: "#C9C9C9",
+                  letterSpacing: "0.18em",
+                  textTransform: "uppercase",
+                  lineHeight: 1.6,
+                }}
+              >
+                {item.price}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <p
+        style={{
+          margin: 0,
+          fontFamily: SANS,
+          fontSize: "0.95rem",
+          lineHeight: 1.65,
+          color: "#B8B8B8",
+          letterSpacing: "-0.01em",
+        }}
+      >
+        Pour un devis précis, le plus simple reste d’en discuter.
+      </p>
+    </section>
+  );
 }
 
 function ContactForm() {
@@ -395,6 +506,7 @@ export function ContactPage() {
               </div>
 
               <ContactForm />
+              <PricingBlock />
             </div>
           </div>
         </section>

@@ -14,6 +14,7 @@ import { JAPAN_VIDEO } from "../assets";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { StickyNav } from "../components/StickyNav";
 import { CustomCursor, setCursorState } from "../components/CustomCursor";
+import { ProjectShinyButton } from "../components/ui/project-shiny-button";
 
 /* ─── Design tokens ──────────────────────────────────────── */
 const MONO = "'JetBrains Mono', monospace";
@@ -218,34 +219,19 @@ function TitleReveal({ title }: { title: string }) {
 
 /* ─── Bouton "Voir la vidéo" ─────────────────────────────── */
 function VideoBtn({ onClick }: { onClick: () => void }) {
-  const [hover, setHover] = useState(false);
   return (
-    <button
+    <ProjectShinyButton
+      type="button"
       onClick={onClick}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      style={{
-        cursor: "pointer",
-        display: "inline-flex",
-        alignItems: "center",
-        gap: "0.55rem",
-        alignSelf: "flex-start",
-        padding: "0.65rem 1rem 0.65rem 0.85rem",
-        borderRadius: "4px",
-        border: hover ? "1px solid #FC1235" : "1px solid rgba(255,255,255,0.1)",
-        backgroundColor: hover ? "#FC1235" : "rgba(255,255,255,0.04)",
-        boxShadow: hover ? "0 0 22px rgba(252,18,53,0.22)" : "none",
-        transform: hover ? "scale(1.03)" : "scale(1)",
-        transition: "all 0.25s cubic-bezier(0.22, 1, 0.36, 1)",
-      }}
+      aria-label="Voir la vidéo"
+      icon={
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+          <path d="M3 2L8 5L3 8V2Z" fill="currentColor" />
+        </svg>
+      }
     >
-      <span style={{ fontFamily: MONO, fontSize: "0.46rem", color: "#fff", letterSpacing: "0.22em", textTransform: "uppercase", lineHeight: 1, fontWeight: 500 }}>
-        Voir la vidéo
-      </span>
-      <svg width="9" height="9" viewBox="0 0 10 10" fill="none" style={{ flexShrink: 0, opacity: hover ? 1 : 0.65, transition: "opacity 0.25s" }}>
-        <path d="M3 2L8 5L3 8V2Z" fill="white" />
-      </svg>
-    </button>
+      Voir la vidéo
+    </ProjectShinyButton>
   );
 }
 
@@ -346,8 +332,6 @@ function MetaLine({ label, value }: { label: string; value: string }) {
 }
 
 function HeroSiteLink({ url }: { url: string }) {
-  const [hover, setHover] = useState(false);
-
   useEffect(() => {
     return () => {
       setCursorState("default");
@@ -355,40 +339,31 @@ function HeroSiteLink({ url }: { url: string }) {
   }, []);
 
   return (
-    <a
+    <ProjectShinyButton
       href={url}
       target="_blank"
       rel="noopener noreferrer"
       onMouseEnter={() => {
-        setHover(true);
         setCursorState("site");
       }}
       onMouseLeave={() => {
-        setHover(false);
         setCursorState("default");
       }}
-      style={{
-        textDecoration: "none",
-        display: "inline-flex",
-        alignItems: "center",
-        gap: "0.55rem",
-        alignSelf: "flex-start",
-        padding: "0.65rem 1rem 0.65rem 0.85rem",
-        borderRadius: "4px",
-        border: hover ? "1px solid #FC1235" : "1px solid rgba(255,255,255,0.1)",
-        backgroundColor: hover ? "#FC1235" : "rgba(255,255,255,0.04)",
-        boxShadow: hover ? "0 0 22px rgba(252,18,53,0.22)" : "none",
-        transform: hover ? "scale(1.03)" : "scale(1)",
-        transition: "all 0.25s cubic-bezier(0.22, 1, 0.36, 1)",
-      }}
+      aria-label="Voir le site"
+      icon={
+        <svg width="11" height="11" viewBox="0 0 13 13" fill="none">
+          <path
+            d="M1 12L12 1M12 1H5M12 1V8"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      }
     >
-      <span style={{ fontFamily: MONO, fontSize: "0.46rem", color: "#fff", letterSpacing: "0.22em", textTransform: "uppercase", lineHeight: 1, fontWeight: 500 }}>
-        Voir le site
-      </span>
-      <svg width="10" height="10" viewBox="0 0 12 12" fill="none" style={{ flexShrink: 0, opacity: hover ? 1 : 0.65, transition: "opacity 0.25s, transform 0.25s", transform: hover ? "translate(1px, -1px)" : "translate(0,0)" }}>
-        <path d="M1 11L11 1M11 1H5M11 1V7" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    </a>
+      Voir le site
+    </ProjectShinyButton>
   );
 }
 
