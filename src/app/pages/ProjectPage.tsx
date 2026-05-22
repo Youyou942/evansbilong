@@ -15,6 +15,7 @@ import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { StickyNav } from "../components/StickyNav";
 import { CustomCursor, setCursorState } from "../components/CustomCursor";
 import { ProjectShinyButton } from "../components/ui/project-shiny-button";
+import { VideoPlayer } from "../components/ui/video-player";
 
 /* ─── Design tokens ──────────────────────────────────────── */
 const MONO = "'JetBrains Mono', monospace";
@@ -237,8 +238,6 @@ function VideoBtn({ onClick }: { onClick: () => void }) {
 
 /* ─── Modal vidéo ────────────────────────────────────────── */
 function VideoModal({ open, onClose, src }: { open: boolean; onClose: () => void; src: string }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-
   /* Fermer avec Escape */
   useEffect(() => {
     if (!open) return;
@@ -246,14 +245,6 @@ function VideoModal({ open, onClose, src }: { open: boolean; onClose: () => void
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [open, onClose]);
-
-  /* Pause + reset à la fermeture */
-  useEffect(() => {
-    if (!open && videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
-    }
-  }, [open]);
 
   if (!open) return null;
 
@@ -285,22 +276,7 @@ function VideoModal({ open, onClose, src }: { open: boolean; onClose: () => void
           </span>
         </button>
 
-        {/* Vidéo */}
-        <video
-          ref={videoRef}
-          src={src}
-          controls
-          autoPlay={false}
-          playsInline
-          style={{
-            display: "block",
-            width: "100%",
-            height: "auto",
-            borderRadius: "2px",
-            outline: "none",
-            backgroundColor: "#000",
-          }}
-        />
+        <VideoPlayer src={src} />
       </div>
     </div>
   );

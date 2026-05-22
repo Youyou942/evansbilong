@@ -3,6 +3,7 @@ import type { FormEvent } from "react";
 import { Footer } from "../components/Footer";
 import { StickyNav } from "../components/StickyNav";
 import { CustomCursor, setCursorState } from "../components/CustomCursor";
+import { ProjectShinyButton } from "../components/ui/project-shiny-button";
 
 const SANS = "'Space Grotesk', sans-serif";
 const MONO = "'JetBrains Mono', monospace";
@@ -388,29 +389,12 @@ function ContactForm() {
         </p>
       )}
 
-      <button
+      <ProjectShinyButton
         type="submit"
         disabled={isSubmitting}
-        className="group inline-flex w-full items-center justify-between rounded-full bg-white px-6 py-4 text-black transition-all duration-500 hover:bg-[#FC1235] hover:text-white disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
-        style={{
-          border: "1px solid rgba(252,18,53,0.18)",
-          boxShadow: "0 14px 40px rgba(255,255,255,0.06), 0 0 0 1px rgba(252,18,53,0.12)",
-        }}
-      >
-        <span
-          style={{
-            fontFamily: SANS,
-            fontSize: "1rem",
-            fontWeight: 600,
-            letterSpacing: "-0.015em",
-            lineHeight: 1,
-          }}
-        >
-          {isSubmitting ? "Envoi en cours…" : "Envoyer le message"}
-        </span>
-        <span
-          className="ml-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-black text-white transition-all duration-500 group-hover:translate-x-1 group-hover:bg-white/20"
-        >
+        aria-busy={isSubmitting}
+        className="project-shiny-button--wide mt-1 w-full sm:w-auto"
+        icon={
           <svg width="11" height="11" viewBox="0 0 13 13" fill="none">
             <path
               d="M1 12L12 1M12 1H5M12 1V8"
@@ -420,8 +404,10 @@ function ContactForm() {
               strokeLinejoin="round"
             />
           </svg>
-        </span>
-      </button>
+        }
+      >
+        Envoyer le message
+      </ProjectShinyButton>
     </form>
   );
 }
