@@ -250,20 +250,20 @@ function VideoModal({ open, onClose, src }: { open: boolean; onClose: () => void
 
   return (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center"
+      className="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto"
       style={{ backgroundColor: "rgba(0,0,0,0.88)", backdropFilter: "blur(6px)" }}
       onClick={onClose}
     >
       <div
         className="relative w-full"
-        style={{ maxWidth: "min(92vw, 1100px)", padding: "0 1rem" }}
+        style={{ width: "min(1100px, calc(100vw - 24px))", maxWidth: "100%", padding: "max(12px, env(safe-area-inset-top)) 0 max(12px, env(safe-area-inset-bottom))" }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Bouton fermer */}
         <button
           onClick={onClose}
-          className="absolute -top-10 right-4 flex items-center gap-2 group"
-          style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}
+          className="absolute right-2 top-2 z-10 flex items-center gap-2 rounded-full border border-white/[0.12] bg-black/55 px-3 py-2 backdrop-blur-md transition-all duration-300 group sm:-top-10 sm:right-4 sm:border-none sm:bg-transparent sm:px-0 sm:py-0"
+          style={{ cursor: "pointer" }}
         >
           <span style={{ fontFamily: MONO, fontSize: "0.44rem", color: "rgba(255,255,255,0.4)", letterSpacing: "0.3em", textTransform: "uppercase" }}
             className="group-hover:text-white transition-colors duration-300">

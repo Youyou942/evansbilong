@@ -1,9 +1,11 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Pause, Play, Volume1, Volume2, VolumeX } from "lucide-react";
 
 import { Button } from "./button";
 import { cn } from "./utils";
+
+const MOBILE_BREAKPOINT_QUERY = "(max-width: 768px)";
 
 function formatTime(seconds: number) {
   if (!Number.isFinite(seconds) || seconds < 0) {
@@ -101,8 +103,29 @@ export function VideoPlayer({ src, className }: VideoPlayerProps) {
   const [showControls, setShowControls] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [isMobileViewport, setIsMobileViewport] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia(MOBILE_BREAKPOINT_QUERY).matches;
+  });
 
-  const controlsVisible = showControls || !isPlaying;
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const mediaQuery = window.matchMedia(MOBILE_BREAKPOINT_QUERY);
+    const updateViewport = () => setIsMobileViewport(mediaQuery.matches);
+
+    updateViewport();
+
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", updateViewport);
+      return () => mediaQuery.removeEventListener("change", updateViewport);
+    }
+
+    mediaQuery.addListener(updateViewport);
+    return () => mediaQuery.removeListener(updateViewport);
+  }, []);
+
+  const controlsVisible = isMobileViewport || showControls || !isPlaying;
 
   const togglePlay = async () => {
     const video = videoRef.current;
@@ -198,16 +221,22 @@ export function VideoPlayer({ src, className }: VideoPlayerProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       onMouseEnter={() => setShowControls(true)}
-      onMouseLeave={() => setShowControls(false)}
+      onMouseLeave={() => {
+        if (!isMobileViewport) {
+          setShowControls(false);
+        }
+      }}
       onTouchStart={() => setShowControls(true)}
+      style={{ maxWidth: "100%" }}
     >
-      <div className="relative aspect-video w-full bg-black">
+      <div className="relative w-full bg-black" style={{ aspectRatio: "16 / 9", maxHeight: isMobileViewport ? "75dvh" : undefined }}>
         <video
           ref={videoRef}
           src={src}
           className="h-full w-full bg-black object-contain"
           playsInline
           preload="metadata"
+          style={{ width: "100%", height: "100%", objectFit: "contain" }}
           onClick={() => {
             setShowControls(true);
             void togglePlay();
@@ -233,8 +262,12 @@ export function VideoPlayer({ src, className }: VideoPlayerProps) {
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               exit={{ opacity: 0, y: 14, filter: "blur(10px)" }}
               transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                maxWidth: isMobileViewport ? "calc(100% - 24px)" : undefined,
+                marginInline: "auto",
+              }}
             >
-              <div className="mb-3 flex items-center gap-3">
+              <div className="mb-3 flex items-center gap-2 sm:gap-3">
                 <span className="min-w-[2.75rem] font-mono text-[0.65rem] uppercase tracking-[0.18em] text-white/72 sm:text-[0.7rem]">
                   {formatTime(currentTime)}
                 </span>
@@ -245,7 +278,7 @@ export function VideoPlayer({ src, className }: VideoPlayerProps) {
               </div>
 
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                   <Button
                     type="button"
                     onClick={() => void togglePlay()}
@@ -273,13 +306,13 @@ export function VideoPlayer({ src, className }: VideoPlayerProps) {
                       )}
                     </Button>
 
-                    <div className="w-24 max-w-[34vw] sm:w-28">
+                    <div className="w-[72px] max-w-[26vw] sm:w-28 sm:max-w-none">
                       <CustomSlider value={volume * 100} onChange={handleVolumeChange} ariaLabel="Volume" />
                     </div>
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="grid grid-cols-4 gap-1.5 sm:flex sm:flex-wrap sm:items-center sm:gap-2">
                   {[0.5, 1, 1.5, 2].map((speed) => (
                     <Button
                       key={speed}
@@ -288,7 +321,7 @@ export function VideoPlayer({ src, className }: VideoPlayerProps) {
                       variant="ghost"
                       size="sm"
                       className={cn(
-                        "h-8 rounded-full border border-white/8 bg-white/5 px-3 text-[0.72rem] font-medium text-white/82 hover:bg-[#FC1235]/14 hover:text-white",
+                        "h-8 rounded-full border border-white/8 bg-white/5 px-2 text-[0.68rem] font-medium text-white/82 hover:bg-[#FC1235]/14 hover:text-white sm:px-3 sm:text-[0.72rem]",
                         playbackSpeed === speed &&
                           "border-[#FC1235]/45 bg-[#FC1235]/16 text-white shadow-[inset_0_0_0_1px_rgba(252,18,53,0.12)]",
                       )}

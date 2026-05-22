@@ -393,7 +393,7 @@ function ContactForm() {
         type="submit"
         disabled={isSubmitting}
         aria-busy={isSubmitting}
-        className="project-shiny-button--wide mt-1 w-full sm:w-auto"
+        className="project-shiny-button--wide mt-1 w-full"
         icon={
           <svg width="11" height="11" viewBox="0 0 13 13" fill="none">
             <path
