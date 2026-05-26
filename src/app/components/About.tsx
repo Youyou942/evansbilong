@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { motion, useInView } from "motion/react";
-import { GlowCard } from "./ui/spotlight-card";
+import { Logos3 } from "./ui/logos3";
 
 const MONO = "'JetBrains Mono', monospace";
 const SANS = "'Space Grotesk', sans-serif";
@@ -8,16 +8,16 @@ const DOTO = "'Doto', monospace";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 const TOOLS = [
-  { name: "Figma", tag: "Design UI" },
-  { name: "Adobe Photoshop", tag: "Image" },
-  { name: "Adobe Illustrator", tag: "Vectoriel" },
-  { name: "After Effects", tag: "Motion" },
-  { name: "Premiere Pro", tag: "Montage" },
-  { name: "InDesign", tag: "Édition" },
-  { name: "Lightroom", tag: "Photo" },
-  { name: "Shopify", tag: "E-commerce" },
-  { name: "WordPress", tag: "CMS" },
-  { name: "VS Code", tag: "Code" },
+  { id: "figma", name: "Figma", mark: "Fi" },
+  { id: "photoshop", name: "Photoshop", mark: "Ps" },
+  { id: "illustrator", name: "Illustrator", mark: "Ai" },
+  { id: "after-effects", name: "After Effects", mark: "Ae" },
+  { id: "premiere-pro", name: "Premiere Pro", mark: "Pr" },
+  { id: "indesign", name: "InDesign", mark: "Id" },
+  { id: "lightroom", name: "Lightroom", mark: "Lr" },
+  { id: "shopify", name: "Shopify", mark: "Sh" },
+  { id: "wordpress", name: "WordPress", mark: "Wp" },
+  { id: "vs-code", name: "VS Code", mark: "Vs" },
 ];
 
 export function About() {
@@ -127,81 +127,14 @@ export function About() {
         className="mb-0 h-px origin-left bg-white/[0.05]"
       />
 
-      <div className="mx-auto mt-10 max-w-[1400px] px-5 sm:mt-12 sm:px-6 md:px-10 lg:mt-16 lg:px-12">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {TOOLS.map((tool, i) => (
-            <motion.div
-              key={tool.name}
-              initial={{ opacity: 0, y: 24 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{
-                duration: 0.62,
-                delay: 0.16 + i * 0.055,
-                ease: EASE,
-              }}
-            >
-              <GlowCard
-                glowColor="red"
-                className="group min-h-[126px] cursor-default bg-[#080808]/90"
-              >
-                <div
-                  className="pointer-events-none absolute inset-0 opacity-70"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, rgba(255,255,255,0.04), transparent 42%), radial-gradient(circle at 82% 18%, rgba(252,18,53,0.09), transparent 34%)",
-                  }}
-                />
-                <div className="relative z-10 flex h-full min-h-[84px] flex-col justify-between gap-5">
-                  <div className="flex items-center justify-between gap-4">
-                    <span
-                      style={{
-                        fontFamily: MONO,
-                        fontSize: "0.48rem",
-                        color: "#FC1235",
-                        letterSpacing: "0.24em",
-                      }}
-                    >
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#FC1235] opacity-70 shadow-[0_0_18px_rgba(252,18,53,0.45)]" />
-                  </div>
-
-                  <div>
-                    <h3
-                      className="transition-colors duration-300 group-hover:text-[#FC1235]"
-                      style={{
-                        fontFamily: SANS,
-                        fontSize: "clamp(1.02rem, 3vw, 1.18rem)",
-                        fontWeight: 700,
-                        letterSpacing: "-0.03em",
-                        color: "#fff",
-                        lineHeight: 1.08,
-                        margin: 0,
-                      }}
-                    >
-                      {tool.name}
-                    </h3>
-                    <p
-                      className="mt-2 transition-colors duration-300 group-hover:text-white/55"
-                      style={{
-                        fontFamily: MONO,
-                        fontSize: "0.5rem",
-                        color: "rgba(255,255,255,0.36)",
-                        letterSpacing: "0.18em",
-                        lineHeight: 1.5,
-                        marginBottom: 0,
-                        textTransform: "uppercase",
-                      }}
-                    >
-                      {tool.tag}
-                    </p>
-                  </div>
-                </div>
-              </GlowCard>
-            </motion.div>
-          ))}
-        </div>
-      </div>
+      <motion.div
+        initial={{ opacity: 0, y: 18 }}
+        animate={isInView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.75, delay: 0.18, ease: EASE }}
+        className="mx-auto mt-8 max-w-[1400px] py-6 sm:mt-10 sm:py-8 lg:mt-12"
+      >
+        <Logos3 logos={TOOLS} />
+      </motion.div>
     </section>
   );
 }
