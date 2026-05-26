@@ -34,29 +34,6 @@ export function Hero() {
 
   const heroImage = isMobile ? EVANS_PORTRAIT_MOBILE_IMAGE : EVANS_PORTRAIT_IMAGE;
 
-  const headlineLines = [
-    {
-      key: "intro",
-      content: (
-        <>
-          Rien n'est là
-          <br className="sm:hidden" /> par hasard.
-        </>
-      ),
-      delay: 0.20,
-    },
-    {
-      key: "detail",
-      content: <>Chaque détail</>,
-      delay: 0.34,
-    },
-    {
-      key: "reason",
-      content: <>a sa raison.</>,
-      delay: 0.48,
-    },
-  ];
-
   return (
     <section
       id="accueil"
@@ -107,27 +84,7 @@ export function Hero() {
           · démarre à 0.2s (légèrement après l'image)
       ══════════════════════════════════════════════════════ */}
       <div className="absolute z-30 left-5 right-5 top-[52%] -translate-y-1/2 sm:left-6 sm:right-6 sm:top-[50%] md:left-[clamp(3.25rem,7vw,5.75rem)] md:right-auto md:top-[48%] lg:left-[clamp(3.75rem,7.2vw,7.5rem)]" style={{ maxWidth: "clamp(14rem, 80vw, 36rem)" }}>
-        {headlineLines.map(({ key, content, delay }) => (
-          <motion.span
-            key={key}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              opacity: { duration: 1.0, delay, ease: SOFT_OUT  },
-              y:       { duration: 1.1, delay, ease: CINEMATIC },
-            }}
-            className="block text-white"
-            style={{
-              fontFamily: MANROPE,
-              fontSize: "clamp(1.45rem, 5.5vw, 3rem)",
-              fontWeight: 400,
-              lineHeight: 1.1,
-              letterSpacing: "-0.02em",
-            }}
-          >
-            {content}
-          </motion.span>
-        ))}
+        <HeroTextReveal />
       </div>
 
       {/* ══════════════════════════════════════════════════════
@@ -199,5 +156,52 @@ export function Hero() {
         </p>
       </motion.div>
     </section>
+  );
+}
+
+function HeroTextReveal() {
+  const lines = [
+    ["Rien", "n'est", "là", "par", "hasard."],
+    ["Chaque", "détail"],
+    ["a", "sa", "raison."],
+  ];
+
+  let wordIndex = 0;
+
+  return (
+    <div aria-label={"Rien n'est là par hasard.\nChaque détail\na sa raison."}>
+      {lines.map((line, lineIndex) => (
+        <span
+          key={lineIndex}
+          aria-hidden="true"
+          className="block"
+          style={{
+            fontFamily: MANROPE,
+            fontSize: "clamp(1.45rem, 5.5vw, 3rem)",
+            fontWeight: 400,
+            lineHeight: 1.1,
+            letterSpacing: "-0.02em",
+          }}
+        >
+          {line.map((word, index) => {
+            const delay = 0.22 + wordIndex * 0.085;
+            wordIndex += 1;
+
+            return (
+              <motion.span
+                key={`${lineIndex}-${word}`}
+                initial={{ opacity: 0.22 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.7, delay, ease: SOFT_OUT }}
+                className="inline-block text-white"
+              >
+                {word}
+                {index < line.length - 1 ? "\u00A0" : ""}
+              </motion.span>
+            );
+          })}
+        </span>
+      ))}
+    </div>
   );
 }
