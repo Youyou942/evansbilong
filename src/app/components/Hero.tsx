@@ -184,7 +184,7 @@ function HeroTextReveal() {
           }}
         >
           {line.map((word, index) => {
-            const delay = 0.22 + wordIndex * 0.085;
+            const delay = 0.28 + wordIndex * 0.2;
             wordIndex += 1;
 
             return (
@@ -192,7 +192,7 @@ function HeroTextReveal() {
                 key={`${lineIndex}-${word}`}
                 initial={{ opacity: 0.22 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.7, delay, ease: SOFT_OUT }}
+                transition={{ duration: 0.85, delay, ease: SOFT_OUT }}
                 className="inline-block text-white"
               >
                 {word}

@@ -24,30 +24,18 @@ const marqueeStyles = `
   }
 
   .tools-marquee-left {
-    animation: tools-marquee-left 38s linear infinite;
-  }
-
-  .tools-marquee-right {
-    animation: tools-marquee-right 42s linear infinite;
+    animation: tools-marquee-left 56s linear infinite;
   }
 `;
 
 export function Logos3({ logos, className }: Logos3Props) {
   const loopedLogos = [...logos, ...logos, ...logos, ...logos];
-  const reversedLogos = [...logos].reverse();
-  const loopedReversedLogos = [
-    ...reversedLogos,
-    ...reversedLogos,
-    ...reversedLogos,
-    ...reversedLogos,
-  ];
 
   return (
     <div className={cn("relative w-full overflow-hidden bg-black", className)}>
       <style dangerouslySetInnerHTML={{ __html: marqueeStyles }} />
-      <div className="relative flex flex-col gap-5 bg-black sm:gap-7">
+      <div className="relative bg-black">
         <IconRow logos={loopedLogos} direction="left" />
-        <IconRow logos={loopedReversedLogos} direction="right" />
       </div>
 
       <div
@@ -70,29 +58,22 @@ export function Logos3({ logos, className }: Logos3Props) {
 
 function IconRow({
   logos,
-  direction,
 }: {
   logos: Logo[];
-  direction: "left" | "right";
+  direction: "left";
 }) {
   return (
     <div className="flex w-max bg-black">
       <div
-        className={cn(
-          "flex w-max items-center gap-8 bg-black sm:gap-11 md:gap-14 lg:gap-16",
-          direction === "left" ? "tools-marquee-left" : "tools-marquee-right"
-        )}
+        className="tools-marquee-left flex w-max items-center gap-9 bg-black sm:gap-12 md:gap-14 lg:gap-16"
         aria-hidden="true"
       >
         {logos.map((logo, index) => (
           <div
-            key={`${direction}-${logo.id}-${index}`}
-            className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-[#050505] text-white/72 sm:h-24 sm:w-24 md:h-28 md:w-28"
-            style={{
-              border: "1px solid rgba(255,255,255,0.08)",
-            }}
+            key={`left-${logo.id}-${index}`}
+            className="flex shrink-0 items-center justify-center text-[#FC1235]"
           >
-            <logo.Icon className="h-11 w-11 sm:h-13 sm:w-13 md:h-16 md:w-16" />
+            <logo.Icon className="h-9 w-9 sm:h-11 sm:w-11 md:h-12 md:w-12 lg:h-13 lg:w-13" />
           </div>
         ))}
       </div>
