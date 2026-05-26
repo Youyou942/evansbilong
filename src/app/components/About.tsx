@@ -1,5 +1,17 @@
 import { useRef } from "react";
 import { motion, useInView } from "motion/react";
+import {
+  SiAdobeaftereffects,
+  SiAdobeillustrator,
+  SiAdobeindesign,
+  SiAdobelightroom,
+  SiAdobephotoshop,
+  SiAdobepremierepro,
+  SiFigma,
+  SiShopify,
+  SiVisualstudiocode,
+  SiWordpress,
+} from "react-icons/si";
 import { Logos3 } from "./ui/logos3";
 
 const MONO = "'JetBrains Mono', monospace";
@@ -8,16 +20,16 @@ const DOTO = "'Doto', monospace";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 const TOOLS = [
-  { id: "figma", name: "Figma", mark: "Fi" },
-  { id: "photoshop", name: "Photoshop", mark: "Ps" },
-  { id: "illustrator", name: "Illustrator", mark: "Ai" },
-  { id: "after-effects", name: "After Effects", mark: "Ae" },
-  { id: "premiere-pro", name: "Premiere Pro", mark: "Pr" },
-  { id: "indesign", name: "InDesign", mark: "Id" },
-  { id: "lightroom", name: "Lightroom", mark: "Lr" },
-  { id: "shopify", name: "Shopify", mark: "Sh" },
-  { id: "wordpress", name: "WordPress", mark: "Wp" },
-  { id: "vs-code", name: "VS Code", mark: "Vs" },
+  { id: "figma", name: "Figma", Icon: SiFigma },
+  { id: "photoshop", name: "Photoshop", Icon: SiAdobephotoshop },
+  { id: "illustrator", name: "Illustrator", Icon: SiAdobeillustrator },
+  { id: "after-effects", name: "After Effects", Icon: SiAdobeaftereffects },
+  { id: "premiere-pro", name: "Premiere Pro", Icon: SiAdobepremierepro },
+  { id: "indesign", name: "InDesign", Icon: SiAdobeindesign },
+  { id: "lightroom", name: "Lightroom", Icon: SiAdobelightroom },
+  { id: "shopify", name: "Shopify", Icon: SiShopify },
+  { id: "wordpress", name: "WordPress", Icon: SiWordpress },
+  { id: "vs-code", name: "VS Code", Icon: SiVisualstudiocode },
 ];
 
 export function About() {
@@ -30,6 +42,7 @@ export function About() {
       ref={ref}
       className="relative overflow-hidden bg-black"
       style={{
+        backgroundColor: "#000000",
         paddingTop: "clamp(4.75rem, 10vw, 7rem)",
         paddingBottom: "clamp(4.75rem, 10vw, 7rem)",
       }}
@@ -37,15 +50,13 @@ export function About() {
       <div
         className="pointer-events-none absolute left-[-8%] top-1/2 h-[480px] w-[480px] -translate-y-1/2 rounded-full"
         style={{
-          background:
-            "radial-gradient(circle, rgba(252,18,53,0.07) 0%, transparent 70%)",
+          background: "transparent",
         }}
       />
       <div
         className="pointer-events-none absolute right-[-8%] top-1/2 h-[360px] w-[360px] -translate-y-1/2 rounded-full"
         style={{
-          background:
-            "radial-gradient(circle, rgba(252,18,53,0.04) 0%, transparent 70%)",
+          background: "transparent",
         }}
       />
 
@@ -93,10 +104,10 @@ export function About() {
             <h2
               style={{
                 fontFamily: SANS,
-                fontSize: "clamp(1.8rem, 6vw, 2.6rem)",
+                fontSize: "clamp(2rem, 4.6vw, 4rem)",
                 fontWeight: 700,
-                lineHeight: 1.08,
-                letterSpacing: "-0.035em",
+                lineHeight: 0.92,
+                letterSpacing: "-0.045em",
                 color: "#fff",
                 margin: 0,
               }}
@@ -124,14 +135,15 @@ export function About() {
         initial={{ scaleX: 0 }}
         animate={isInView ? { scaleX: 1 } : {}}
         transition={{ duration: 1.2, ease: EASE }}
-        className="mb-0 h-px origin-left bg-white/[0.05]"
+        className="mb-0 h-px origin-left bg-black"
       />
 
       <motion.div
         initial={{ opacity: 0, y: 18 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.75, delay: 0.18, ease: EASE }}
-        className="mx-auto mt-8 max-w-[1400px] py-6 sm:mt-10 sm:py-8 lg:mt-12"
+        className="mx-auto mt-8 max-w-[1400px] bg-black py-6 sm:mt-10 sm:py-8 lg:mt-12"
+        style={{ backgroundColor: "#000000" }}
       >
         <Logos3 logos={TOOLS} />
       </motion.div>

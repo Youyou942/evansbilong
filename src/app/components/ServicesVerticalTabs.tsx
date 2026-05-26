@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useInView } from "motion/react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { cn } from "./ui/utils";
@@ -13,14 +13,9 @@ type Service = {
   index: string;
   title: string;
   description: string;
-  visual: {
-    label: string;
-    grid: string;
-    glow: string;
-    rail: string;
-    orb: string;
-    line: string;
-  };
+  image: string;
+  imageAlt: string;
+  objectPosition?: string;
 };
 
 const SERVICES: Service[] = [
@@ -30,15 +25,9 @@ const SERVICES: Service[] = [
     title: "Web design",
     description:
       "Interfaces claires, visuelles et pensées pour guider l’utilisateur sans perdre l’identité de la marque.",
-    visual: {
-      label: "Direction visuelle",
-      grid: "linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px)",
-      glow:
-        "radial-gradient(circle at 24% 18%, rgba(252,18,53,0.26), transparent 34%), radial-gradient(circle at 76% 66%, rgba(255,255,255,0.08), transparent 30%)",
-      rail: "linear-gradient(90deg, transparent, rgba(252,18,53,0.92), transparent)",
-      orb: "radial-gradient(circle, rgba(252,18,53,0.9), rgba(252,18,53,0.08) 42%, transparent 68%)",
-      line: "M 40 260 C 180 115 310 360 500 170 C 620 70 710 140 810 72",
-    },
+    image: "/images/services/service-web-design.jpg",
+    imageAlt: "Visual web design premium",
+    objectPosition: "center",
   },
   {
     id: "ux-ui",
@@ -46,15 +35,9 @@ const SERVICES: Service[] = [
     title: "UX/UI",
     description:
       "Structure, hiérarchie et parcours utilisateur pour rendre l’expérience plus lisible et plus fluide.",
-    visual: {
-      label: "Parcours & structure",
-      grid: "linear-gradient(120deg, rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(30deg, rgba(255,255,255,0.028) 1px, transparent 1px)",
-      glow:
-        "radial-gradient(circle at 34% 72%, rgba(252,18,53,0.2), transparent 34%), radial-gradient(circle at 78% 18%, rgba(255,255,255,0.075), transparent 26%)",
-      rail: "linear-gradient(180deg, transparent, rgba(252,18,53,0.95), transparent)",
-      orb: "radial-gradient(circle, rgba(255,255,255,0.78), rgba(252,18,53,0.18) 36%, transparent 66%)",
-      line: "M 56 98 C 186 98 158 238 286 238 C 410 238 390 118 520 118 C 658 118 650 285 792 285",
-    },
+    image: "/images/services/service-ux-ui.jpg",
+    imageAlt: "Visual UX UI premium",
+    objectPosition: "center",
   },
   {
     id: "shopify",
@@ -62,15 +45,9 @@ const SERVICES: Service[] = [
     title: "Shopify",
     description:
       "Boutiques e-commerce sur mesure, pensées pour présenter les produits clairement et faciliter l’achat.",
-    visual: {
-      label: "E-commerce sur mesure",
-      grid: "linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(252,18,53,0.045) 1px, transparent 1px)",
-      glow:
-        "radial-gradient(circle at 72% 28%, rgba(252,18,53,0.22), transparent 32%), radial-gradient(circle at 26% 78%, rgba(255,255,255,0.07), transparent 28%)",
-      rail: "linear-gradient(90deg, rgba(252,18,53,0.05), rgba(252,18,53,0.85), rgba(252,18,53,0.05))",
-      orb: "radial-gradient(circle, rgba(252,18,53,0.8), rgba(252,18,53,0.16) 34%, transparent 70%)",
-      line: "M 72 302 L 214 154 L 344 234 L 478 106 L 610 206 L 770 80",
-    },
+    image: "/images/services/service-shopify.jpg",
+    imageAlt: "Visual Shopify e-commerce premium",
+    objectPosition: "center",
   },
   {
     id: "branding",
@@ -78,15 +55,9 @@ const SERVICES: Service[] = [
     title: "Branding",
     description:
       "Directions visuelles cohérentes pour donner plus de caractère et de reconnaissance à un projet.",
-    visual: {
-      label: "Identité & caractère",
-      grid: "radial-gradient(circle, rgba(255,255,255,0.055) 1px, transparent 1px)",
-      glow:
-        "radial-gradient(circle at 50% 48%, rgba(252,18,53,0.2), transparent 34%), radial-gradient(circle at 18% 22%, rgba(255,255,255,0.07), transparent 24%)",
-      rail: "conic-gradient(from 120deg, transparent, rgba(252,18,53,0.78), transparent 38%)",
-      orb: "radial-gradient(circle, rgba(252,18,53,0.72), rgba(252,18,53,0.12) 40%, transparent 68%)",
-      line: "M 90 210 C 210 72 366 72 478 210 C 590 348 714 344 812 198",
-    },
+    image: "/images/services/service-branding.jpg",
+    imageAlt: "Visual branding premium",
+    objectPosition: "center",
   },
   {
     id: "integration-web",
@@ -94,15 +65,9 @@ const SERVICES: Service[] = [
     title: "Intégration web",
     description:
       "Mise en place propre, responsive et cohérente avec la maquette et la direction graphique.",
-    visual: {
-      label: "Responsive build",
-      grid: "linear-gradient(rgba(255,255,255,0.038) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.038) 1px, transparent 1px)",
-      glow:
-        "radial-gradient(circle at 20% 24%, rgba(252,18,53,0.19), transparent 30%), radial-gradient(circle at 78% 72%, rgba(252,18,53,0.14), transparent 32%)",
-      rail: "linear-gradient(135deg, transparent, rgba(252,18,53,0.85), transparent)",
-      orb: "radial-gradient(circle, rgba(255,255,255,0.7), rgba(252,18,53,0.18) 38%, transparent 70%)",
-      line: "M 70 82 H 306 V 188 H 508 V 306 H 790",
-    },
+    image: "/images/services/service-integration-web.jpg",
+    imageAlt: "Visual intégration web premium",
+    objectPosition: "center",
   },
 ];
 
@@ -216,10 +181,10 @@ export function ServicesVerticalTabs() {
           <h2
             style={{
               fontFamily: SANS,
-              fontSize: "clamp(2.8rem, 7vw, 6.2rem)",
+              fontSize: "clamp(2rem, 4.6vw, 4rem)",
               fontWeight: 700,
-              letterSpacing: "-0.06em",
-              lineHeight: 0.9,
+              letterSpacing: "-0.045em",
+              lineHeight: 0.92,
               color: "#FFFFFF",
               margin: 0,
             }}
@@ -342,23 +307,13 @@ export function ServicesVerticalTabs() {
           <div className="order-1 lg:order-2 lg:col-span-7">
             <div className="relative">
               <div
-                className="relative aspect-[1.08/1] overflow-hidden rounded-[1.65rem] border sm:aspect-[4/3] md:rounded-[2rem] lg:aspect-[16/11] xl:rounded-[2.35rem]"
+                className="relative aspect-[1.08/1] overflow-hidden rounded-[1.65rem] border bg-[#050505] sm:aspect-[4/3] md:rounded-[2rem] lg:aspect-[16/11] xl:rounded-[2.35rem]"
                 style={{
-                  background:
-                    "linear-gradient(145deg, #050505 0%, #0B0B0B 52%, #050505 100%)",
                   borderColor: "rgba(255,255,255,0.08)",
                   boxShadow:
                     "0 28px 90px rgba(0,0,0,0.48), inset 0 1px 0 rgba(255,255,255,0.055)",
                 }}
               >
-                <div
-                  className="absolute inset-0 opacity-[0.08]"
-                  style={{
-                    backgroundImage:
-                      "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.9) 1px, transparent 0)",
-                    backgroundSize: "18px 18px",
-                  }}
-                />
                 <AnimatePresence initial={false} custom={direction} mode="popLayout">
                   <motion.div
                     key={SERVICES[activeIndex].id}
@@ -380,14 +335,6 @@ export function ServicesVerticalTabs() {
                   </motion.div>
                 </AnimatePresence>
 
-                <div
-                  className="absolute inset-x-0 bottom-0 z-10 h-1/3 pointer-events-none"
-                  style={{
-                    background:
-                      "linear-gradient(180deg, transparent, rgba(0,0,0,0.72))",
-                  }}
-                />
-
                 <div className="absolute bottom-5 right-5 z-20 flex gap-2 sm:bottom-7 sm:right-7 sm:gap-3">
                   <ArrowButton label="Service précédent" onClick={handlePrev}>
                     <ArrowLeft size={18} strokeWidth={1.8} />
@@ -406,132 +353,29 @@ export function ServicesVerticalTabs() {
 }
 
 function ServiceVisual({ service }: { service: Service }) {
+  const [hasImageError, setHasImageError] = useState(false);
+
   return (
-    <div className="absolute inset-0 overflow-hidden">
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(145deg, rgba(255,255,255,0.035), transparent 38%), #070707",
-        }}
-      />
-      <div
-        className="absolute inset-0 opacity-65"
-        style={{
-          backgroundImage: service.visual.grid,
-          backgroundSize:
-            service.id === "branding" ? "34px 34px" : "54px 54px",
-        }}
-      />
-      <div
-        className="absolute inset-0"
-        style={{ background: service.visual.glow }}
-      />
-      <motion.div
-        className="absolute left-1/2 top-1/2 h-[62%] w-[72%] -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
-        style={{ background: service.visual.orb }}
-        animate={{ scale: [1, 1.06, 1], opacity: [0.48, 0.68, 0.48] }}
-        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <div
-        className="absolute left-[10%] top-[18%] h-[64%] w-[80%] rounded-[2rem] border"
-        style={{
-          borderColor: "rgba(255,255,255,0.075)",
-          background:
-            "linear-gradient(135deg, rgba(255,255,255,0.045), rgba(255,255,255,0.012))",
-          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)",
-        }}
-      />
-      <div
-        className="absolute left-[13%] right-[13%] top-[26%] h-px"
-        style={{ background: service.visual.rail }}
-      />
-      <div
-        className="absolute bottom-[20%] left-[18%] h-px w-[38%]"
-        style={{
-          background:
-            "linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.26), rgba(255,255,255,0))",
-        }}
-      />
-      <div
-        className="absolute bottom-[31%] right-[17%] h-px w-[26%]"
-        style={{
-          background:
-            "linear-gradient(90deg, rgba(252,18,53,0), rgba(252,18,53,0.58), rgba(252,18,53,0))",
-        }}
-      />
-      <svg
-        className="absolute inset-x-[7%] top-[18%] h-[64%] w-[86%]"
-        viewBox="0 0 860 380"
-        preserveAspectRatio="none"
-        aria-hidden="true"
-      >
-        <motion.path
-          d={service.visual.line}
-          fill="none"
-          stroke="rgba(252,18,53,0.74)"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeDasharray="7 12"
-          initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: 1 }}
-          transition={{ duration: 1.2, ease: EASE }}
+    <div className="absolute inset-0 overflow-hidden bg-[#050505]">
+      {hasImageError ? (
+        // Keeps the visual area clean if an expected local image is replaced or missing.
+        <div className="absolute inset-0 bg-[#050505]" />
+      ) : (
+        <img
+          src={service.image}
+          alt={service.imageAlt}
+          className="h-full w-full object-cover"
+          style={{ objectPosition: service.objectPosition ?? "center" }}
+          onError={() => setHasImageError(true)}
         />
-        <path
-          d={service.visual.line}
-          fill="none"
-          stroke="rgba(255,255,255,0.12)"
-          strokeWidth="9"
-          strokeLinecap="round"
-          filter="blur(10px)"
-        />
-      </svg>
-      <div className="absolute left-5 top-5 flex items-center gap-3 sm:left-7 sm:top-7">
-        <span
-          className="h-2 w-2 rounded-full"
-          style={{
-            backgroundColor: "#FC1235",
-            boxShadow: "0 0 18px rgba(252,18,53,0.55)",
-          }}
-        />
-        <span
-          style={{
-            fontFamily: MONO,
-            color: "rgba(255,255,255,0.52)",
-            fontSize: "0.52rem",
-            letterSpacing: "0.28em",
-            textTransform: "uppercase",
-          }}
-        >
-          {service.visual.label}
-        </span>
-      </div>
-      <div className="absolute bottom-5 left-5 right-28 z-20 sm:bottom-7 sm:left-7">
-        <span
-          className="mb-2 block"
-          style={{
-            fontFamily: MONO,
-            color: "#FC1235",
-            fontSize: "0.52rem",
-            letterSpacing: "0.28em",
-          }}
-        >
-          {service.index}
-        </span>
-        <p
-          style={{
-            fontFamily: SANS,
-            color: "#FFFFFF",
-            fontSize: "clamp(1.55rem, 5vw, 2.8rem)",
-            fontWeight: 650,
-            letterSpacing: "-0.045em",
-            lineHeight: 0.95,
-            margin: 0,
-          }}
-        >
-          {service.title}
-        </p>
-      </div>
+      )}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.48) 100%)",
+        }}
+      />
     </div>
   );
 }
@@ -541,7 +385,7 @@ function ArrowButton({
   label,
   onClick,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   label: string;
   onClick: () => void;
 }) {

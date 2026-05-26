@@ -1,11 +1,12 @@
 import AutoScroll from "embla-carousel-auto-scroll";
+import type { IconType } from "react-icons";
 import { Carousel, CarouselContent, CarouselItem } from "./carousel";
 import { cn } from "./utils";
 
 interface Logo {
   id: string;
   name: string;
-  mark: string;
+  Icon: IconType;
 }
 
 interface Logos3Props {
@@ -15,7 +16,7 @@ interface Logos3Props {
 
 export function Logos3({ logos, className }: Logos3Props) {
   return (
-    <div className={cn("relative w-full overflow-hidden", className)}>
+    <div className={cn("relative w-full overflow-hidden bg-black", className)}>
       <Carousel
         opts={{
           align: "start",
@@ -30,9 +31,9 @@ export function Logos3({ logos, className }: Logos3Props) {
             stopOnMouseEnter: true,
           }),
         ]}
-        className="w-full"
+        className="w-full bg-black"
       >
-        <CarouselContent className="ml-0">
+        <CarouselContent className="ml-0 bg-black">
           {[...logos, ...logos].map((logo, index) => (
             <CarouselItem
               key={`${logo.id}-${index}`}
@@ -40,18 +41,13 @@ export function Logos3({ logos, className }: Logos3Props) {
             >
               <div className="flex min-h-20 items-center justify-center px-6 sm:min-h-24 sm:px-8 lg:px-10">
                 <div className="group flex items-center gap-3 text-white/42 transition-colors duration-300 hover:text-[#FC1235]">
-                  <span
-                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[0.62rem] font-semibold tracking-[-0.03em] text-white/70 transition-colors duration-300 group-hover:text-[#FC1235] sm:h-9 sm:w-9"
+                  <logo.Icon
+                    className="h-6 w-6 shrink-0 text-white/70 transition-colors duration-300 group-hover:text-[#FC1235] sm:h-7 sm:w-7"
                     style={{
-                      border: "1px solid rgba(255,255,255,0.08)",
-                      background:
-                        "linear-gradient(145deg, rgba(255,255,255,0.045), rgba(255,255,255,0.01))",
-                      boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06)",
+                      color: "currentColor",
                     }}
                     aria-hidden="true"
-                  >
-                    {logo.mark}
-                  </span>
+                  />
                   <span
                     className="whitespace-nowrap text-sm font-semibold tracking-[-0.02em] sm:text-base"
                     style={{ fontFamily: "'Space Grotesk', sans-serif" }}
