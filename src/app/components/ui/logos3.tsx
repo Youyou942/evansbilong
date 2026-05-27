@@ -1,4 +1,5 @@
 import type { IconType } from "react-icons";
+import { ToolIconLiquid } from "./ToolIconLiquid";
 import { cn } from "./utils";
 
 interface Logo {
@@ -32,9 +33,9 @@ export function Logos3({ logos, className }: Logos3Props) {
   const loopedLogos = [...logos, ...logos, ...logos, ...logos];
 
   return (
-    <div className={cn("relative w-full overflow-hidden bg-black", className)}>
+    <div className={cn("relative w-full overflow-hidden", className)}>
       <style dangerouslySetInnerHTML={{ __html: marqueeStyles }} />
-      <div className="relative bg-black">
+      <div className="relative">
         <IconRow logos={loopedLogos} direction="left" />
       </div>
 
@@ -63,18 +64,17 @@ function IconRow({
   direction: "left";
 }) {
   return (
-    <div className="flex w-max bg-black">
+    <div className="flex w-max">
       <div
-        className="tools-marquee-left flex w-max items-center gap-9 bg-black sm:gap-12 md:gap-14 lg:gap-16"
+        className="tools-marquee-left flex w-max items-center gap-9 sm:gap-12 md:gap-14 lg:gap-16"
         aria-hidden="true"
       >
         {logos.map((logo, index) => (
-          <div
+          <ToolIconLiquid
             key={`left-${logo.id}-${index}`}
-            className="flex shrink-0 items-center justify-center text-[#FC1235]"
-          >
-            <logo.Icon className="h-9 w-9 sm:h-11 sm:w-11 md:h-12 md:w-12 lg:h-13 lg:w-13" />
-          </div>
+            name={logo.name}
+            Icon={logo.Icon}
+          />
         ))}
       </div>
     </div>

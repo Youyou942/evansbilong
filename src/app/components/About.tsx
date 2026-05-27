@@ -13,6 +13,7 @@ import {
   SiWordpress,
 } from "react-icons/si";
 import { Logos3 } from "./ui/logos3";
+import { ToolsBeamsBackground } from "./ui/ToolsBeamsBackground";
 
 const MONO = "'JetBrains Mono', monospace";
 const SANS = "'Space Grotesk', sans-serif";
@@ -47,6 +48,8 @@ export function About() {
         paddingBottom: "clamp(4.75rem, 10vw, 7rem)",
       }}
     >
+      <ToolsBeamsBackground />
+
       <div
         className="pointer-events-none absolute left-[-8%] top-1/2 h-[480px] w-[480px] -translate-y-1/2 rounded-full"
         style={{
@@ -60,7 +63,7 @@ export function About() {
         }}
       />
 
-      <div className="mx-auto mb-14 max-w-[1400px] px-5 sm:mb-16 sm:px-6 md:px-10 lg:mb-20 lg:px-12">
+      <div className="relative z-10 mx-auto mb-14 max-w-[1400px] px-5 sm:mb-16 sm:px-6 md:px-10 lg:mb-20 lg:px-12">
         <div className="flex flex-col justify-between gap-6 sm:gap-8 lg:flex-row lg:items-end">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -135,15 +138,14 @@ export function About() {
         initial={{ scaleX: 0 }}
         animate={isInView ? { scaleX: 1 } : {}}
         transition={{ duration: 1.2, ease: EASE }}
-        className="mb-0 h-px origin-left bg-black"
+        className="relative z-10 mb-0 h-px origin-left bg-black"
       />
 
       <motion.div
         initial={{ opacity: 0, y: 18 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.75, delay: 0.18, ease: EASE }}
-        className="mx-auto mt-8 max-w-[1400px] bg-black py-6 sm:mt-10 sm:py-8 lg:mt-12"
-        style={{ backgroundColor: "#000000" }}
+        className="relative z-10 mx-auto mt-8 max-w-[1400px] py-6 sm:mt-10 sm:py-8 lg:mt-12"
       >
         <Logos3 logos={TOOLS} />
       </motion.div>
