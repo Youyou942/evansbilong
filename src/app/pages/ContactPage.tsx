@@ -4,6 +4,7 @@ import { ContactAnimatedCard } from "../components/ContactAnimatedCard";
 import { Footer } from "../components/Footer";
 import { StickyNav } from "../components/StickyNav";
 import { CustomCursor, setCursorState } from "../components/CustomCursor";
+import { ContactBeamsBackground } from "../components/ui/ContactBeamsBackground";
 import { ProjectShinyButton } from "../components/ui/project-shiny-button";
 
 const SANS = "'Space Grotesk', sans-serif";
@@ -430,12 +431,14 @@ export function ContactPage() {
 
       <main>
         <section
-          className="relative"
+          className="relative overflow-hidden bg-black"
           style={{
             paddingTop: "clamp(7.5rem, 16vw, 10.5rem)",
             paddingBottom: "clamp(4.5rem, 10vw, 6.5rem)",
           }}
         >
+          <ContactBeamsBackground />
+
           <div
             aria-hidden="true"
             style={{
