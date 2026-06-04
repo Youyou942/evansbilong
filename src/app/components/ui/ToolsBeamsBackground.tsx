@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { cn } from "./utils";
 
@@ -89,10 +89,42 @@ export function ToolsBeamsBackground({
   className,
   intensity = "subtle",
 }: ToolsBeamsBackgroundProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const beamsRef = useRef<Beam[]>([]);
   const animationFrameRef = useRef<number | null>(null);
   const sizeRef = useRef({ width: 0, height: 0, isMobile: false });
+  const [isActive, setIsActive] = useState(false);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root || typeof IntersectionObserver === "undefined") return;
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let isVisible = false;
+
+    const updateActive = () => {
+      setIsActive(isVisible && !document.hidden && !reduceMotion.matches);
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting;
+        updateActive();
+      },
+      { rootMargin: "160px 0px" }
+    );
+
+    observer.observe(root);
+    document.addEventListener("visibilitychange", updateActive);
+    reduceMotion.addEventListener("change", updateActive);
+
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", updateActive);
+      reduceMotion.removeEventListener("change", updateActive);
+    };
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -102,17 +134,13 @@ export function ToolsBeamsBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const reduceMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-
     const updateCanvasSize = () => {
       const rect = parent.getBoundingClientRect();
       const width = Math.max(1, rect.width);
       const height = Math.max(1, rect.height);
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       const isMobile = width < 640;
-      const beamCount = width < 460 ? 0 : isMobile ? 6 : width < 1024 ? 9 : 13;
+      const beamCount = width < 460 ? 0 : isMobile ? 3 : width < 1024 ? 6 : 10;
 
       canvas.width = Math.floor(width * dpr);
       canvas.height = Math.floor(height * dpr);
@@ -159,7 +187,7 @@ export function ToolsBeamsBackground({
     const resizeObserver = new ResizeObserver(updateCanvasSize);
     resizeObserver.observe(parent);
 
-    if (!reduceMotion) {
+    if (isActive) {
       animate();
     }
 
@@ -169,10 +197,11 @@ export function ToolsBeamsBackground({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [intensity]);
+  }, [intensity, isActive]);
 
   return (
     <div
+      ref={rootRef}
       className={cn(
         "pointer-events-none absolute inset-0 overflow-hidden bg-black",
         className
@@ -181,17 +210,17 @@ export function ToolsBeamsBackground({
     >
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 opacity-[0.16] sm:opacity-[0.18]"
+        className="absolute inset-0 opacity-[0.10] sm:opacity-[0.16]"
       />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_62%,rgba(252,18,53,0.08),rgba(18,0,5,0.04)_34%,transparent_62%)] sm:hidden" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_62%,rgba(252,18,53,0.045),rgba(18,0,5,0.025)_34%,transparent_62%)] sm:hidden" />
       <motion.div
         className="absolute inset-0 bg-black/10"
-        animate={{ opacity: [0.12, 0.2, 0.12] }}
-        transition={{
+        animate={isActive ? { opacity: [0.12, 0.2, 0.12] } : { opacity: 0.12 }}
+        transition={isActive ? {
           duration: 12,
           ease: "easeInOut",
           repeat: Number.POSITIVE_INFINITY,
-        }}
+        } : { duration: 0.4 }}
         style={{ backdropFilter: "blur(42px)" }}
       />
       <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black to-transparent" />

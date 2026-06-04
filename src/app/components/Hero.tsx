@@ -59,6 +59,9 @@ export function Hero() {
         <ImageWithFallback
           src={heroImage}
           alt={EVANS_PORTRAIT_ALT}
+          loading="eager"
+          decoding="async"
+          sizes="100vw"
           className="h-full w-full object-cover"
           style={{
             filter: "brightness(0.82)",

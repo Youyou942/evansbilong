@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
-import { motion } from "motion/react";
+import { useEffect, useRef, useState } from "react";
+import { motion, useInView, useReducedMotion } from "motion/react";
 
 import { cn } from "./ui/utils";
 
@@ -10,14 +10,26 @@ type ContactAnimatedCardProps = {
 };
 
 export function ContactAnimatedCard({ children, className }: ContactAnimatedCardProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
   const [isMounted, setIsMounted] = useState(false);
+  const [isPageVisible, setIsPageVisible] = useState(true);
+  const isInView = useInView(rootRef, { once: false, margin: "-80px" });
+  const prefersReducedMotion = useReducedMotion();
+  const isActive = isInView && isPageVisible && !prefersReducedMotion;
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
+  useEffect(() => {
+    const onVisibilityChange = () => setIsPageVisible(!document.hidden);
+    onVisibilityChange();
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", onVisibilityChange);
+  }, []);
+
   return (
-    <div className={cn("relative w-full", className)}>
+    <div ref={rootRef} className={cn("relative w-full", className)}>
       <motion.div
         className="relative"
         initial={isMounted ? { opacity: 0 } : false}
@@ -38,35 +50,35 @@ export function ContactAnimatedCard({ children, className }: ContactAnimatedCard
           aria-hidden="true"
           className="pointer-events-none absolute -inset-[1px] rounded-[30px]"
           animate={{
-            boxShadow: [
+            boxShadow: isActive ? [
               "0 0 0 1px rgba(252,18,53,0.09), 0 24px 60px rgba(0,0,0,0.46)",
               "0 0 0 1px rgba(252,18,53,0.13), 0 28px 70px rgba(0,0,0,0.5)",
               "0 0 0 1px rgba(252,18,53,0.09), 0 24px 60px rgba(0,0,0,0.46)",
-            ],
+            ] : "0 0 0 1px rgba(252,18,53,0.09), 0 24px 60px rgba(0,0,0,0.46)",
           }}
-          transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+          transition={isActive ? { duration: 9, repeat: Infinity, ease: "easeInOut" } : { duration: 0.4 }}
         />
 
         <div className="pointer-events-none absolute -inset-[1px] overflow-hidden rounded-[30px]">
           <motion.div
             className="absolute left-[-40%] top-0 h-px w-[34%] bg-gradient-to-r from-transparent via-[#FC1235] to-transparent opacity-52 blur-[0.8px]"
-            animate={{ left: ["-40%", "106%"] }}
-            transition={{ duration: 5.8, repeat: Infinity, ease: "easeInOut" }}
+            animate={isActive ? { left: ["-40%", "106%"] } : { left: "-40%" }}
+            transition={isActive ? { duration: 5.8, repeat: Infinity, ease: "easeInOut" } : { duration: 0.4 }}
           />
           <motion.div
             className="absolute right-0 top-[-42%] h-[34%] w-px bg-gradient-to-b from-transparent via-[#FC1235] to-transparent opacity-44 blur-[0.8px]"
-            animate={{ top: ["-42%", "106%"] }}
-            transition={{ duration: 5.8, repeat: Infinity, ease: "easeInOut", delay: 1.45 }}
+            animate={isActive ? { top: ["-42%", "106%"] } : { top: "-42%" }}
+            transition={isActive ? { duration: 5.8, repeat: Infinity, ease: "easeInOut", delay: 1.45 } : { duration: 0.4 }}
           />
           <motion.div
             className="absolute bottom-0 right-[-40%] h-px w-[34%] bg-gradient-to-r from-transparent via-[#FC1235] to-transparent opacity-52 blur-[0.8px]"
-            animate={{ right: ["-40%", "106%"] }}
-            transition={{ duration: 5.8, repeat: Infinity, ease: "easeInOut", delay: 2.9 }}
+            animate={isActive ? { right: ["-40%", "106%"] } : { right: "-40%" }}
+            transition={isActive ? { duration: 5.8, repeat: Infinity, ease: "easeInOut", delay: 2.9 } : { duration: 0.4 }}
           />
           <motion.div
             className="absolute bottom-[-42%] left-0 h-[34%] w-px bg-gradient-to-b from-transparent via-[#FC1235] to-transparent opacity-44 blur-[0.8px]"
-            animate={{ bottom: ["-42%", "106%"] }}
-            transition={{ duration: 5.8, repeat: Infinity, ease: "easeInOut", delay: 4.35 }}
+            animate={isActive ? { bottom: ["-42%", "106%"] } : { bottom: "-42%" }}
+            transition={isActive ? { duration: 5.8, repeat: Infinity, ease: "easeInOut", delay: 4.35 } : { duration: 0.4 }}
           />
         </div>
 

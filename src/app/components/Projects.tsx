@@ -5,6 +5,7 @@ import {
   useScroll,
   useTransform,
   useSpring,
+  useReducedMotion,
 } from "motion/react";
 import { Link } from "react-router";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
@@ -16,6 +17,24 @@ const MONO = "'JetBrains Mono', monospace";
 const SANS = "'Space Grotesk', sans-serif";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia(query).matches;
+  });
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(query);
+    const update = () => setMatches(mediaQuery.matches);
+
+    update();
+    mediaQuery.addEventListener("change", update);
+    return () => mediaQuery.removeEventListener("change", update);
+  }, [query]);
+
+  return matches;
+}
+
 /* ─── Bloc projet individuel ──────────────────────────────── */
 function ProjectBlock({
   project,
@@ -26,6 +45,8 @@ function ProjectBlock({
 }) {
   const blockRef = useRef<HTMLAnchorElement>(null);
   const [hovered, setHovered] = useState(false);
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     return () => {
@@ -34,17 +55,6 @@ function ProjectBlock({
   }, []);
 
   const isInView = useInView(blockRef, { once: true, margin: "-10%" });
-
-  const { scrollYProgress } = useScroll({
-    target: blockRef,
-    offset: ["start end", "end start"],
-  });
-
-  const rawImageY = useTransform(scrollYProgress, [0, 1], ["5%", "-5%"]);
-  const imageY = useSpring(rawImageY, { stiffness: 55, damping: 22, mass: 0.9 });
-
-  const rawImageScale = useTransform(scrollYProgress, [0, 0.4], [1.07, 1]);
-  const imageScale = useSpring(rawImageScale, { stiffness: 50, damping: 24, mass: 1 });
 
   const isEven = i % 2 === 0;
 
@@ -85,107 +95,24 @@ function ProjectBlock({
         className="relative flex flex-col lg:flex-row lg:h-[min(72vw,780px)]"
       >
         {/* ── IMAGE ── */}
-        <div
-          className={`relative overflow-hidden flex-shrink-0 h-[clamp(18rem,62vw,34rem)] sm:h-[clamp(22rem,56vw,38rem)] lg:h-full w-full lg:w-[65%] ${isEven ? "lg:order-1" : "lg:order-2"}`}
-        >
-          {/* Fade-in wrapper */}
-          <motion.div
-            className="absolute inset-0"
-            initial={{ opacity: 0 }}
-            animate={isInView ? { opacity: 1 } : {}}
-            transition={{ duration: 1.0, ease: EASE }}
-          >
-            {/* Parallax + hover scale */}
-            <motion.div
-              className="absolute inset-0"
-              style={{ y: imageY, scale: imageScale }}
-              animate={{ scale: hovered ? 1.022 : 1 }}
-              transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-            >
-              <ImageWithFallback
-                src={project.coverImage ?? project.image}
-                alt={project.title}
-                className="absolute inset-0 w-full h-full object-cover"
-                style={{
-                  objectPosition: project.objectPosition,
-                  filter: hovered
-                    ? "brightness(0.68) contrast(1.1) saturate(0.88)"
-                    : "brightness(0.58) contrast(1.08) saturate(0.82)",
-                  transition: "filter 0.4s ease",
-                }}
-              />
-            </motion.div>
-          </motion.div>
-
-          {/* Fondu latéral — vers le panneau texte */}
-          <div
-            className="absolute inset-0 z-10 hidden lg:block pointer-events-none"
-            style={{
-              background: isEven
-                ? "linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 42%, rgba(0,0,0,0.55) 65%, rgba(0,0,0,0.97) 100%)"
-                : "linear-gradient(to left,  rgba(0,0,0,0) 0%, rgba(0,0,0,0) 42%, rgba(0,0,0,0.55) 65%, rgba(0,0,0,0.97) 100%)",
-            }}
+        {isDesktop && !prefersReducedMotion ? (
+          <DesktopProjectImage
+            project={project}
+            targetRef={blockRef}
+            isEven={isEven}
+            hovered={hovered}
+            isInView={isInView}
+            priority={i === 0}
           />
-          <div
-            className="absolute inset-0 z-10 lg:hidden pointer-events-none"
-            style={{
-              background:
-                "linear-gradient(to top, rgba(0,0,0,0.74) 0%, rgba(0,0,0,0.18) 32%, rgba(0,0,0,0) 62%)",
-            }}
+        ) : (
+          <MobileProjectImage
+            project={project}
+            isEven={isEven}
+            hovered={hovered}
+            isInView={isInView}
+            priority={i === 0}
           />
-
-          {/* Fondu haut */}
-          <div
-            className="absolute inset-0 z-10 pointer-events-none"
-            style={{
-              background: "linear-gradient(to bottom, rgba(0,0,0,0.38) 0%, transparent 18%)",
-            }}
-          />
-
-          {/* Fondu bas */}
-          <div
-            className="absolute inset-0 z-10 pointer-events-none"
-            style={{
-              background: "linear-gradient(to top, rgba(0,0,0,0.42) 0%, transparent 22%)",
-            }}
-          />
-
-          {/* Lueur rouge — côté opposé au texte */}
-          <div
-            className="absolute inset-0 z-10 pointer-events-none"
-            style={{
-              background: isEven
-                ? "radial-gradient(ellipse 45% 55% at 18% 55%, rgba(252,18,53,0.055) 0%, transparent 65%)"
-                : "radial-gradient(ellipse 45% 55% at 82% 55%, rgba(252,18,53,0.055) 0%, transparent 65%)",
-            }}
-          />
-
-          {/* Numéro filigrane */}
-          <div
-            className="absolute z-10 pointer-events-none select-none"
-            style={{
-              bottom: 0,
-              [isEven ? "left" : "right"]: "clamp(1rem, 3vw, 2.5rem)",
-            }}
-          >
-            <motion.span
-              initial={{ opacity: 0 }}
-              animate={isInView ? { opacity: 1 } : {}}
-              transition={{ duration: 1.6, delay: 0.25, ease: EASE }}
-              style={{
-                fontFamily: SANS,
-                fontSize: "clamp(4.5rem, 17vw, 13rem)",
-                fontWeight: 700,
-                color: "rgba(255,255,255,0.028)",
-                lineHeight: 1,
-                letterSpacing: "-0.06em",
-                display: "block",
-              }}
-            >
-              {project.index}
-            </motion.span>
-          </div>
-        </div>
+        )}
 
         {/* ── TEXTE ── */}
         <motion.div
@@ -328,6 +255,215 @@ function ProjectBlock({
         </motion.div>
       </div>
     </Link>
+  );
+}
+
+function ProjectImageFrame({
+  children,
+  isEven,
+}: {
+  children: React.ReactNode;
+  isEven: boolean;
+}) {
+  return (
+    <div
+      className={`relative overflow-hidden flex-shrink-0 h-[clamp(18rem,62vw,34rem)] sm:h-[clamp(22rem,56vw,38rem)] lg:h-full w-full lg:w-[65%] ${isEven ? "lg:order-1" : "lg:order-2"}`}
+      style={{ aspectRatio: "16 / 9" }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function ProjectCover({
+  project,
+  hovered,
+  priority,
+}: {
+  project: Project;
+  hovered: boolean;
+  priority: boolean;
+}) {
+  return (
+    <ImageWithFallback
+      src={project.coverImage ?? project.image}
+      alt={project.title}
+      loading={priority ? "eager" : "lazy"}
+      decoding={priority ? "sync" : "async"}
+      sizes="(min-width: 1024px) 65vw, 100vw"
+      className="absolute inset-0 w-full h-full object-cover"
+      style={{
+        objectPosition: project.objectPosition,
+        filter: hovered
+          ? "brightness(0.68) contrast(1.1) saturate(0.88)"
+          : "brightness(0.58) contrast(1.08) saturate(0.82)",
+        transition: "filter 0.4s ease",
+      }}
+    />
+  );
+}
+
+function DesktopProjectImage({
+  project,
+  targetRef,
+  isEven,
+  hovered,
+  isInView,
+  priority,
+}: {
+  project: Project;
+  targetRef: React.RefObject<HTMLAnchorElement>;
+  isEven: boolean;
+  hovered: boolean;
+  isInView: boolean;
+  priority: boolean;
+}) {
+  const { scrollYProgress } = useScroll({
+    target: targetRef,
+    offset: ["start end", "end start"],
+  });
+  const rawImageY = useTransform(scrollYProgress, [0, 1], ["5%", "-5%"]);
+  const imageY = useSpring(rawImageY, { stiffness: 55, damping: 22, mass: 0.9 });
+  const rawImageScale = useTransform(scrollYProgress, [0, 0.4], [1.07, 1]);
+  const imageScale = useSpring(rawImageScale, { stiffness: 50, damping: 24, mass: 1 });
+
+  return (
+    <ProjectImageFrame isEven={isEven}>
+      <motion.div
+        className="absolute inset-0"
+        initial={{ opacity: 0 }}
+        animate={isInView ? { opacity: 1 } : {}}
+        transition={{ duration: 1.0, ease: EASE }}
+      >
+        <motion.div
+          className="absolute inset-0"
+          style={{ y: imageY, scale: imageScale }}
+          animate={{ scale: hovered ? 1.022 : 1 }}
+          transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+        >
+          <ProjectCover project={project} hovered={hovered} priority={priority} />
+        </motion.div>
+      </motion.div>
+
+      <ProjectImageOverlays isEven={isEven} />
+      <ProjectImageNumber index={project.index} isEven={isEven} isInView={isInView} />
+    </ProjectImageFrame>
+  );
+}
+
+function MobileProjectImage({
+  project,
+  isEven,
+  hovered,
+  isInView,
+  priority,
+}: {
+  project: Project;
+  isEven: boolean;
+  hovered: boolean;
+  isInView: boolean;
+  priority: boolean;
+}) {
+  return (
+    <ProjectImageFrame isEven={isEven}>
+      <motion.div
+        className="absolute inset-0"
+        initial={{ opacity: 0, scale: 1.015 }}
+        animate={isInView ? { opacity: 1, scale: 1 } : {}}
+        transition={{ duration: 0.8, ease: EASE }}
+      >
+        <ProjectCover project={project} hovered={hovered} priority={priority} />
+      </motion.div>
+
+      <ProjectImageOverlays isEven={isEven} />
+      <ProjectImageNumber index={project.index} isEven={isEven} isInView={isInView} />
+    </ProjectImageFrame>
+  );
+}
+
+function ProjectImageNumber({
+  index,
+  isEven,
+  isInView,
+}: {
+  index: string;
+  isEven: boolean;
+  isInView: boolean;
+}) {
+  return (
+    <div
+      className="absolute z-10 pointer-events-none select-none"
+      style={{
+        bottom: 0,
+        [isEven ? "left" : "right"]: "clamp(1rem, 3vw, 2.5rem)",
+      }}
+    >
+      <motion.span
+        initial={{ opacity: 0 }}
+        animate={isInView ? { opacity: 1 } : {}}
+        transition={{ duration: 1.6, delay: 0.25, ease: EASE }}
+        style={{
+          fontFamily: SANS,
+          fontSize: "clamp(4.5rem, 17vw, 13rem)",
+          fontWeight: 700,
+          color: "rgba(255,255,255,0.028)",
+          lineHeight: 1,
+          letterSpacing: "-0.06em",
+          display: "block",
+        }}
+      >
+        {index}
+      </motion.span>
+    </div>
+  );
+}
+
+function ProjectImageOverlays({ isEven }: { isEven: boolean }) {
+  return (
+    <>
+      {/* Fondu latéral — vers le panneau texte */}
+      <div
+        className="absolute inset-0 z-10 hidden lg:block pointer-events-none"
+        style={{
+          background: isEven
+            ? "linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 42%, rgba(0,0,0,0.55) 65%, rgba(0,0,0,0.97) 100%)"
+            : "linear-gradient(to left,  rgba(0,0,0,0) 0%, rgba(0,0,0,0) 42%, rgba(0,0,0,0.55) 65%, rgba(0,0,0,0.97) 100%)",
+        }}
+      />
+      <div
+        className="absolute inset-0 z-10 lg:hidden pointer-events-none"
+        style={{
+          background:
+            "linear-gradient(to top, rgba(0,0,0,0.74) 0%, rgba(0,0,0,0.18) 32%, rgba(0,0,0,0) 62%)",
+        }}
+      />
+
+      {/* Fondu haut */}
+      <div
+        className="absolute inset-0 z-10 pointer-events-none"
+        style={{
+          background: "linear-gradient(to bottom, rgba(0,0,0,0.38) 0%, transparent 18%)",
+        }}
+      />
+
+      {/* Fondu bas */}
+      <div
+        className="absolute inset-0 z-10 pointer-events-none"
+        style={{
+          background: "linear-gradient(to top, rgba(0,0,0,0.42) 0%, transparent 22%)",
+        }}
+      />
+
+      {/* Lueur rouge — côté opposé au texte */}
+      <div
+        className="absolute inset-0 z-10 pointer-events-none"
+        style={{
+          background: isEven
+            ? "radial-gradient(ellipse 45% 55% at 18% 55%, rgba(252,18,53,0.055) 0%, transparent 65%)"
+            : "radial-gradient(ellipse 45% 55% at 82% 55%, rgba(252,18,53,0.055) 0%, transparent 65%)",
+        }}
+      />
+    </>
   );
 }
 

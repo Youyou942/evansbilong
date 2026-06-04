@@ -6,6 +6,7 @@ import {
   useScroll,
   useTransform,
   useSpring,
+  useReducedMotion,
 } from "motion/react";
 import { getProjectBySlug, getAdjacentProjects, PROJECTS } from "../data/projects";
 import type { Project } from "../data/projects";
@@ -24,6 +25,24 @@ const SANS = "'Space Grotesk', sans-serif";
 const E = [0.22, 1, 0.36, 1] as const;
 
 const FALLBACK_GALLERY_ASPECTS = ["4 / 3", "3 / 4", "16 / 10", "16 / 10", "16 / 10"];
+
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia(query).matches;
+  });
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(query);
+    const update = () => setMatches(mediaQuery.matches);
+
+    update();
+    mediaQuery.addEventListener("change", update);
+    return () => mediaQuery.removeEventListener("change", update);
+  }, [query]);
+
+  return matches;
+}
 
 function getAspectValue(aspect: string): number {
   const [width, height] = aspect.split("/").map((part) => Number(part.trim()));
@@ -383,6 +402,8 @@ function HeroSiteLink({ url }: { url: string }) {
 function OpeningShot({ project }: { project: Project }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-5%" });
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const prefersReducedMotion = useReducedMotion();
   const openingImage = getProjectPageImages(project)[0];
   const openingAspect = getAspectValue(openingImage?.aspect ?? "16 / 9");
   const openingHeight = openingImage?.objectFit === "contain"
@@ -393,6 +414,7 @@ function OpeningShot({ project }: { project: Project }) {
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const rawY = useTransform(scrollYProgress, [0, 1], ["-4%", "4%"]);
   const y = useSpring(rawY, { stiffness: 55, damping: 28, mass: 1 });
+  const parallaxY = isDesktop && !prefersReducedMotion ? y : "0%";
 
   return (
     <section ref={ref} className="relative w-full overflow-hidden bg-black" style={{ height: openingHeight }}>
@@ -403,10 +425,13 @@ function OpeningShot({ project }: { project: Project }) {
         animate={inView ? { opacity: 1, scale: 1 } : {}}
         transition={{ duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] }}
       >
-        <motion.div className="absolute inset-0" style={{ y }}>
+        <motion.div className="absolute inset-0" style={{ y: parallaxY }}>
           <ImageWithFallback
             src={openingImage?.src ?? project.image}
             alt={openingImage?.alt ?? project.title}
+            loading="eager"
+            decoding="async"
+            sizes={openingImage?.sizes ?? "100vw"}
             className="absolute inset-0 w-full h-full"
             style={{
               objectFit: openingImage?.objectFit ?? "cover",
@@ -890,6 +915,9 @@ function ClipImage({
             <ImageWithFallback
               src={image.src}
               alt={image.alt}
+              loading="lazy"
+              decoding="async"
+              sizes={image.sizes ?? "100vw"}
               className="absolute inset-0 w-full h-full"
               style={{
                 objectFit: image.objectFit ?? "cover",
@@ -943,6 +971,9 @@ function NaturalImage({
         <ImageWithFallback
           src={image.src}
           alt={image.alt}
+          loading="lazy"
+          decoding="async"
+          sizes={image.sizes ?? "100vw"}
           style={{
             display: "block",
             width: "100%",
@@ -1131,19 +1162,26 @@ function NavCard({ project, direction }: { project: Project; direction: "prev" |
       style={{ textDecoration: "none", padding: "clamp(2.5rem, 6vw, 4.5rem) clamp(1.5rem, 4vw, 3rem)", minHeight: "250px" }}
     >
       {/* Preview image — fade-in au hover */}
-      <motion.div
-        className="absolute inset-0 pointer-events-none"
-        animate={{ opacity: hover ? 0.3 : 0 }}
-        transition={{ duration: 0.6, ease: E }}
-      >
-        <ImageWithFallback
-          src={project.image}
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ objectPosition: project.objectPosition, filter: "brightness(0.5) contrast(1.1) saturate(0.8)" }}
-        />
-        <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.88) 100%)" }} />
-      </motion.div>
+      {hover && (
+        <motion.div
+          className="absolute inset-0 pointer-events-none"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.3 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.6, ease: E }}
+        >
+          <ImageWithFallback
+            src={project.image}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            sizes="50vw"
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ objectPosition: project.objectPosition, filter: "brightness(0.5) contrast(1.1) saturate(0.8)" }}
+          />
+          <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.88) 100%)" }} />
+        </motion.div>
+      )}
 
       <div className={`relative z-10 flex flex-col gap-3.5 ${isNext ? "md:items-end md:text-right" : ""}`}>
         <span style={{ fontFamily: MONO, fontSize: "0.46rem", letterSpacing: "0.32em", textTransform: "uppercase", transition: "color 0.3s ease", color: hover ? "#FC1235" : "#555" }}>

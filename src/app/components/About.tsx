@@ -15,9 +15,7 @@ import {
 import { Logos3 } from "./ui/logos3";
 import { ToolsBeamsBackground } from "./ui/ToolsBeamsBackground";
 
-const MONO = "'JetBrains Mono', monospace";
 const SANS = "'Space Grotesk', sans-serif";
-const DOTO = "'Doto', monospace";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 const TOOLS = [
@@ -65,39 +63,6 @@ export function About() {
 
       <div className="relative z-10 mx-auto mb-14 max-w-[1400px] px-5 sm:mb-16 sm:px-6 md:px-10 lg:mb-20 lg:px-12">
         <div className="flex flex-col justify-between gap-6 sm:gap-8 lg:flex-row lg:items-end">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, ease: EASE }}
-            className="flex items-center gap-3 sm:gap-4"
-          >
-            <span
-              style={{
-                fontFamily: DOTO,
-                fontSize: "clamp(2.5rem, 11vw, 5rem)",
-                color: "#FC1235",
-                opacity: 0.18,
-                lineHeight: 1,
-                letterSpacing: "0.04em",
-              }}
-            >
-              02
-            </span>
-            <div className="flex flex-col gap-1">
-              <span
-                style={{
-                  fontFamily: MONO,
-                  fontSize: "0.5rem",
-                  color: "#FC1235",
-                  letterSpacing: "0.4em",
-                }}
-              >
-                MÉTHODE
-              </span>
-              <div className="h-px w-8 bg-[#FC1235]/30" />
-            </div>
-          </motion.div>
-
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}

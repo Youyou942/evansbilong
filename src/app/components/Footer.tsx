@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { motion, useInView, useScroll, useTransform } from "motion/react";
+import { useEffect, useRef, useState } from "react";
+import { motion, useInView, useReducedMotion, useScroll, useTransform } from "motion/react";
 
 /* ─── Polices (cohérentes avec le reste du site) ─────────── */
 const MONO = "'JetBrains Mono', monospace";
@@ -227,12 +227,23 @@ function DownloadCVCTA() {
 ═══════════════════════════════════════════════════════════ */
 export function Footer() {
   const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(sectionRef, { once: true, margin: "-60px" });
+  const isInView = useInView(sectionRef, { once: false, margin: "-60px" });
+  const hasEnteredView = useInView(sectionRef, { once: true, margin: "-60px" });
+  const [isPageVisible, setIsPageVisible] = useState(true);
+  const prefersReducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"],
   });
   const nameY = useTransform(scrollYProgress, [0, 1], ["6%", "-6%"]);
+  const marqueeActive = isInView && isPageVisible && !prefersReducedMotion;
+
+  useEffect(() => {
+    const onVisibilityChange = () => setIsPageVisible(!document.hidden);
+    onVisibilityChange();
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", onVisibilityChange);
+  }, []);
 
   return (
     <footer
@@ -264,7 +275,7 @@ export function Footer() {
           {/* ── Colonne gauche : accroche + CTA (7/12) ── */}
           <motion.div
             initial={{ opacity: 0, y: 24 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            animate={hasEnteredView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.85, ease: EASE }}
             className="lg:col-span-7"
           >
@@ -374,7 +385,7 @@ export function Footer() {
           {/* ── Colonne droite : liens sociaux (5/12) ── */}
           <motion.div
             initial={{ opacity: 0, y: 24 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            animate={hasEnteredView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.85, delay: 0.12, ease: EASE }}
             className="lg:col-span-5 lg:pl-10 xl:pl-16 flex flex-col lg:items-end"
           >
@@ -422,8 +433,8 @@ export function Footer() {
         <motion.div style={{ y: nameY }}>
           <motion.div
             className="flex items-center whitespace-nowrap"
-            animate={{ x: ["0%", "-16.666%"] }}
-            transition={{ duration: 80, repeat: Infinity, ease: "linear" }}
+            animate={marqueeActive ? { x: ["0%", "-16.666%"] } : { x: "0%" }}
+            transition={marqueeActive ? { duration: 80, repeat: Infinity, ease: "linear" } : { duration: 0.4 }}
           >
             {NAME_REPEAT.map((name, i) => (
               <span
@@ -449,8 +460,8 @@ export function Footer() {
 
           <motion.div
             className="flex items-center whitespace-nowrap -mt-2 sm:-mt-3 md:-mt-6"
-            animate={{ x: ["-16.666%", "0%"] }}
-            transition={{ duration: 110, repeat: Infinity, ease: "linear" }}
+            animate={marqueeActive ? { x: ["-16.666%", "0%"] } : { x: "-16.666%" }}
+            transition={marqueeActive ? { duration: 110, repeat: Infinity, ease: "linear" } : { duration: 0.4 }}
           >
             {NAME_REPEAT.map((name, i) => (
               <span

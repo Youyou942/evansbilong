@@ -47,6 +47,7 @@ type ToolIconLiquidProps = {
   name: string;
   Icon: IconType;
   className?: string;
+  active?: boolean;
 };
 
 const createStopsArray = (
@@ -61,7 +62,7 @@ const createStopsArray = (
   );
 };
 
-function LiquidAura({ gradientId }: { gradientId: string }) {
+function LiquidAura({ gradientId, active }: { gradientId: string; active: boolean }) {
   const svgStates: SvgStates = {
     svg1: {
       gradientTransform:
@@ -131,8 +132,8 @@ function LiquidAura({ gradientId }: { gradientId: string }) {
           cy="0"
           r="1"
           gradientUnits="userSpaceOnUse"
-          animate={{ gradientTransform }}
-          transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+          animate={active ? { gradientTransform } : { gradientTransform: gradientTransform[0] }}
+          transition={active ? { duration: 18, repeat: Infinity, ease: "linear" } : { duration: 0.4 }}
         >
           {stopsAnimationArray.map((stopConfigs, index) => (
             <motion.stop
@@ -143,11 +144,11 @@ function LiquidAura({ gradientId }: { gradientId: string }) {
                 stopOpacity: stopConfigs[0].stopOpacity,
               }}
               animate={{
-                offset: stopConfigs.map((config) => config.offset),
-                stopColor: stopConfigs.map((config) => config.stopColor),
-                stopOpacity: stopConfigs.map((config) => config.stopOpacity),
+                offset: active ? stopConfigs.map((config) => config.offset) : stopConfigs[0].offset,
+                stopColor: active ? stopConfigs.map((config) => config.stopColor) : stopConfigs[0].stopColor,
+                stopOpacity: active ? stopConfigs.map((config) => config.stopOpacity) : stopConfigs[0].stopOpacity,
               }}
-              transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+              transition={active ? { duration: 18, repeat: Infinity, ease: "linear" } : { duration: 0.4 }}
             />
           ))}
         </motion.radialGradient>
@@ -160,6 +161,7 @@ export function ToolIconLiquid({
   name,
   Icon,
   className,
+  active = true,
 }: ToolIconLiquidProps) {
   const gradientId = `tool-liquid-${useId().replace(/:/g, "")}`;
 
@@ -172,7 +174,7 @@ export function ToolIconLiquid({
       aria-label={name}
     >
       <div className="pointer-events-none absolute inset-[-18%] -z-10 opacity-75 blur-[13px]">
-        <LiquidAura gradientId={gradientId} />
+        <LiquidAura gradientId={gradientId} active={active} />
       </div>
       <Icon className="h-8 w-8 text-[#FC1235] drop-shadow-[0_0_8px_rgba(252,18,53,0.22)] sm:h-10 sm:w-10 md:h-11 md:w-11" />
     </div>

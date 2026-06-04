@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import { AnimatePresence, motion, useInView } from "motion/react";
+import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { cn } from "./ui/utils";
 
@@ -94,10 +94,13 @@ const slideVariants = {
 
 export function ServicesVerticalTabs() {
   const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(sectionRef, { once: true, margin: "-12%" });
+  const isInView = useInView(sectionRef, { once: false, margin: "-12%" });
+  const hasEnteredView = useInView(sectionRef, { once: true, margin: "-12%" });
   const [activeIndex, setActiveIndex] = useState(0);
   const [direction, setDirection] = useState(1);
   const [isPaused, setIsPaused] = useState(false);
+  const [isPageVisible, setIsPageVisible] = useState(true);
+  const prefersReducedMotion = useReducedMotion();
 
   const handleNext = useCallback(() => {
     setDirection(1);
@@ -117,11 +120,18 @@ export function ServicesVerticalTabs() {
   };
 
   useEffect(() => {
-    if (isPaused) return;
+    const onVisibilityChange = () => setIsPageVisible(!document.hidden);
+    onVisibilityChange();
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", onVisibilityChange);
+  }, []);
+
+  useEffect(() => {
+    if (isPaused || !isInView || !isPageVisible || prefersReducedMotion) return;
 
     const interval = window.setInterval(handleNext, AUTO_PLAY_DURATION);
     return () => window.clearInterval(interval);
-  }, [handleNext, isPaused, activeIndex]);
+  }, [handleNext, isPaused, activeIndex, isInView, isPageVisible, prefersReducedMotion]);
 
   return (
     <section
@@ -154,7 +164,7 @@ export function ServicesVerticalTabs() {
       >
         <motion.div
           initial={{ opacity: 0, y: 18 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          animate={hasEnteredView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7, ease: EASE }}
           className="mb-10 sm:mb-14 lg:mb-16"
         >
@@ -196,7 +206,7 @@ export function ServicesVerticalTabs() {
 
         <motion.div
           initial={{ opacity: 0, y: 26 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          animate={hasEnteredView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.85, delay: 0.1, ease: EASE }}
           className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-14 xl:gap-20"
           onMouseEnter={() => setIsPaused(true)}
@@ -238,7 +248,7 @@ export function ServicesVerticalTabs() {
                             boxShadow: "0 0 14px rgba(252,18,53,0.45)",
                           }}
                           initial={{ height: "0%" }}
-                          animate={{ height: isPaused ? "0%" : "100%" }}
+                          animate={{ height: isPaused || !isInView || !isPageVisible || prefersReducedMotion ? "0%" : "100%" }}
                           transition={{
                             duration: AUTO_PLAY_DURATION / 1000,
                             ease: "linear",

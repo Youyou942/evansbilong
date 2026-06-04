@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { useLocation } from "react-router";
 
 /*
@@ -159,6 +159,7 @@ export function CustomCursor() {
   const location = useLocation();
   const isProjectDetailRoute = location.pathname.startsWith("/projects/");
   const isTouch  = useIsTouch();
+  const prefersReducedMotion = useReducedMotion();
   const mainRef  = useRef<HTMLDivElement>(null);
   const trailRef = useRef<HTMLDivElement>(null);
   const state = useEffective(isProjectDetailRoute);
@@ -174,12 +175,13 @@ export function CustomCursor() {
   /* ── Boucle RAF : position + auto-hover detection ────── */
   useEffect(() => {
     /* Sur mobile/touch, on ne démarre pas la boucle */
-    if (isTouch) return;
+    if (isTouch || prefersReducedMotion) return;
 
     const target   = { x: -200, y: -200 };
     const posMain  = { x: -200, y: -200 };
     const posTrail = { x: -200, y: -200 };
     let raf = 0;
+    let running = false;
 
     const onMove = (e: MouseEvent) => {
       target.x = e.clientX;
@@ -196,6 +198,8 @@ export function CustomCursor() {
     };
 
     const tick = () => {
+      if (!running) return;
+
       posMain.x  += (target.x - posMain.x)  * LERP_MAIN;
       posMain.y  += (target.y - posMain.y)  * LERP_MAIN;
       posTrail.x += (target.x - posTrail.x) * LERP_TRAIL;
@@ -209,16 +213,38 @@ export function CustomCursor() {
       raf = requestAnimationFrame(tick);
     };
 
-    window.addEventListener("mousemove", onMove, { passive: true });
-    raf = requestAnimationFrame(tick);
-    return () => {
-      window.removeEventListener("mousemove", onMove);
+    const start = () => {
+      if (running || document.hidden) return;
+      running = true;
+      raf = requestAnimationFrame(tick);
+    };
+
+    const stop = () => {
+      running = false;
       cancelAnimationFrame(raf);
     };
-  }, [isTouch]);
+
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        stop();
+        return;
+      }
+
+      start();
+    };
+
+    window.addEventListener("mousemove", onMove, { passive: true });
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    start();
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      stop();
+    };
+  }, [isTouch, prefersReducedMotion]);
 
   /* Sur mobile/touch, on ne rend rien */
-  if (isTouch) return null;
+  if (isTouch || prefersReducedMotion) return null;
 
   return (
     <>

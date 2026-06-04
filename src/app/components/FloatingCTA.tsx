@@ -16,9 +16,25 @@ export function FloatingCTA() {
 
   /* Apparaît après 120px de scroll */
   useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > 120);
+    let frame: number | null = null;
+
+    const updateVisible = () => {
+      frame = null;
+      const nextVisible = window.scrollY > 120;
+      setVisible((current) => (current === nextVisible ? current : nextVisible));
+    };
+
+    const onScroll = () => {
+      if (frame !== null) return;
+      frame = window.requestAnimationFrame(updateVisible);
+    };
+
+    updateVisible();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (frame !== null) window.cancelAnimationFrame(frame);
+    };
   }, []);
 
   const goToContactPage = () => {
@@ -83,6 +99,9 @@ export function FloatingCTA() {
               <ImageWithFallback
                 src={EVANS_PORTRAIT_IMAGE}
                 alt={EVANS_PORTRAIT_ALT}
+                loading="lazy"
+                decoding="async"
+                sizes="40px"
                 className="w-full h-full object-cover"
                 style={{
                   objectPosition: "50% 20%",

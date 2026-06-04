@@ -42,7 +42,7 @@ export const PROJECTS: Project[] = [
     category: "Site e-commerce",
     description:
       "Enter The Sanctuary.",
-    image: new URL("../../../images/Mockup 0XRUI.png", import.meta.url).href,
+    image: new URL("../../../images/Mockup 0XRUI-optimized.webp", import.meta.url).href,
     pageImages: OXRUI_PAGE_IMAGES,
     gallery: [
       "https://images.unsplash.com/photo-1478720568477-152d9b164e26?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
@@ -70,7 +70,7 @@ export const PROJECTS: Project[] = [
     category: "Rebranding de marque",
     description:
       "Fly into Tomorrow.",
-    coverImage: new URL("../../../images/Mockup Jp.png", import.meta.url).href,
+    coverImage: new URL("../../../images/Mockup Jp-optimized.webp", import.meta.url).href,
     image:
       "https://images.unsplash.com/photo-1773713035735-d126c00f8e7f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1600",
     pageImages: JAPAN_PAGE_IMAGES,
@@ -99,8 +99,8 @@ export const PROJECTS: Project[] = [
     category: "UX/UI · Refonte produit",
     description:
       "Designed for clarity.",
-    image: new URL("../../../images/Mockup 1 HP.png", import.meta.url).href,
-    coverImage: new URL("../../../images/Mockup 1 HP.png", import.meta.url).href,
+    image: new URL("../../../images/Mockup 1 HP-optimized.webp", import.meta.url).href,
+    coverImage: new URL("../../../images/Mockup 1 HP-optimized.webp", import.meta.url).href,
     pageImages: HYPERPLANNING_PAGE_IMAGES,
     gallery: [
       "https://images.unsplash.com/photo-1460925895917-afdab827c52f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",

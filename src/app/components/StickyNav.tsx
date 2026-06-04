@@ -67,13 +67,27 @@ export function StickyNav() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const onScroll = () => {
-      setScrolled(window.scrollY > 60);
+    let frame: number | null = null;
+
+    const updateScrolled = () => {
+      frame = null;
+      const nextScrolled = window.scrollY > 60;
+      setScrolled((current) => (current === nextScrolled ? current : nextScrolled));
       /* Ferme le menu mobile au scroll */
-      if (window.scrollY > 60) setMobileOpen(false);
+      if (nextScrolled) setMobileOpen(false);
     };
+
+    const onScroll = () => {
+      if (frame !== null) return;
+      frame = window.requestAnimationFrame(updateScrolled);
+    };
+
+    updateScrolled();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (frame !== null) window.cancelAnimationFrame(frame);
+    };
   }, []);
 
   useEffect(() => {
