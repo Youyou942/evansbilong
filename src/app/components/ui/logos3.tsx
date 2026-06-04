@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from "react";
 import type { IconType } from "react-icons";
 import { ToolIconLiquid } from "./ToolIconLiquid";
 import { cn } from "./utils";
@@ -20,56 +19,32 @@ const marqueeStyles = `
     to { transform: translate3d(-50%, 0, 0); }
   }
 
-  @keyframes tools-marquee-right {
-    from { transform: translate3d(-50%, 0, 0); }
-    to { transform: translate3d(0, 0, 0); }
-  }
-
   .tools-marquee-left {
     animation: tools-marquee-left 56s linear infinite;
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
   }
 `;
 
 export function Logos3({ logos, className }: Logos3Props) {
-  const loopedLogos = [...logos, ...logos, ...logos, ...logos];
-  const rootRef = useRef<HTMLDivElement>(null);
-  const [isActive, setIsActive] = useState(false);
-
-  useEffect(() => {
-    const root = rootRef.current;
-    if (!root || typeof IntersectionObserver === "undefined") return;
-
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let isVisible = false;
-
-    const updateActive = () => {
-      setIsActive(isVisible && !document.hidden && !reduceMotion.matches);
-    };
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        isVisible = entry.isIntersecting;
-        updateActive();
-      },
-      { rootMargin: "120px 0px" }
-    );
-
-    observer.observe(root);
-    document.addEventListener("visibilitychange", updateActive);
-    reduceMotion.addEventListener("change", updateActive);
-
-    return () => {
-      observer.disconnect();
-      document.removeEventListener("visibilitychange", updateActive);
-      reduceMotion.removeEventListener("change", updateActive);
-    };
-  }, []);
+  const loopedLogos = [...logos, ...logos];
 
   return (
-    <div ref={rootRef} className={cn("relative w-full overflow-hidden", className)}>
+    <div className={cn("relative w-full overflow-hidden", className)}>
       <style dangerouslySetInnerHTML={{ __html: marqueeStyles }} />
-      <div className="relative">
-        <IconRow logos={loopedLogos} direction="left" active={isActive} />
+      <div className="flex w-max">
+        <div
+          className="tools-marquee-left flex w-max items-center gap-9 sm:gap-12 md:gap-14 lg:gap-16"
+          aria-hidden="true"
+        >
+          {loopedLogos.map((logo, index) => (
+            <ToolIconLiquid
+              key={`${logo.id}-${index}`}
+              name={logo.name}
+              Icon={logo.Icon}
+            />
+          ))}
+        </div>
       </div>
 
       <div
@@ -86,34 +61,6 @@ export function Logos3({ logos, className }: Logos3Props) {
             "linear-gradient(270deg, #000 0%, rgba(0,0,0,0.86) 34%, transparent 100%)",
         }}
       />
-    </div>
-  );
-}
-
-function IconRow({
-  logos,
-  active,
-}: {
-  logos: Logo[];
-  direction: "left";
-  active: boolean;
-}) {
-  return (
-    <div className="flex w-max">
-      <div
-        className="tools-marquee-left flex w-max items-center gap-9 sm:gap-12 md:gap-14 lg:gap-16"
-        aria-hidden="true"
-        style={{ animationPlayState: active ? "running" : "paused" }}
-      >
-        {logos.map((logo, index) => (
-          <ToolIconLiquid
-            key={`left-${logo.id}-${index}`}
-            name={logo.name}
-            Icon={logo.Icon}
-            active={active}
-          />
-        ))}
-      </div>
     </div>
   );
 }
