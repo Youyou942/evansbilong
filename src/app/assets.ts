@@ -10,11 +10,11 @@ export type ProjectPageImage = {
 
 export const EVANS_SIGNATURE = "EVANS BILONG";
 export const EVANS_PORTRAIT_IMAGE = new URL(
-  "../../Generated Image April 13, 2026 - 10_58AM.jpg",
+  "../../Generated Image April 13, 2026 - 10_58AM-optimized.webp",
   import.meta.url,
 ).href;
 export const EVANS_PORTRAIT_MOBILE_IMAGE = new URL(
-  "../../images/Evans Phone.png",
+  "../../images/Evans Phone-optimized.webp",
   import.meta.url,
 ).href;
 export const EVANS_PORTRAIT_ALT = "Portrait d'Evans Bilong";

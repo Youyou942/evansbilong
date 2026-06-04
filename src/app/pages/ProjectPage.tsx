@@ -129,7 +129,7 @@ function Hero({ project }: { project: Project }) {
 
   return (
     <>
-    {showVideoBtn && (
+    {showVideoBtn && videoOpen && (
       <VideoModal
         open={videoOpen}
         onClose={() => setVideoOpen(false)}
