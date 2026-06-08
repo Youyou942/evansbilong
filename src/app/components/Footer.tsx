@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import type { RefObject } from "react";
 import { motion, useInView, useReducedMotion, useScroll, useTransform } from "motion/react";
 
 /* ─── Polices (cohérentes avec le reste du site) ─────────── */
@@ -225,17 +226,103 @@ function DownloadCVCTA() {
 /* ═══════════════════════════════════════════════════════════
    COMPOSANT PRINCIPAL
 ═══════════════════════════════════════════════════════════ */
-export function Footer() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(sectionRef, { once: false, margin: "-60px" });
-  const hasEnteredView = useInView(sectionRef, { once: true, margin: "-60px" });
-  const [isPageVisible, setIsPageVisible] = useState(true);
-  const prefersReducedMotion = useReducedMotion();
+function FooterSignatureParallax({
+  sectionRef,
+  marqueeActive,
+}: {
+  sectionRef: RefObject<HTMLElement>;
+  marqueeActive: boolean;
+}) {
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"],
   });
   const nameY = useTransform(scrollYProgress, [0, 1], ["6%", "-6%"]);
+
+  return <FooterSignatureContent marqueeActive={marqueeActive} nameY={nameY} />;
+}
+
+function FooterSignatureContent({
+  marqueeActive,
+  nameY = "0%",
+}: {
+  marqueeActive: boolean;
+  nameY?: string | ReturnType<typeof useTransform>;
+}) {
+  return (
+    <div
+      className="relative mt-16 sm:mt-20 lg:mt-32 overflow-hidden select-none pointer-events-none"
+    >
+      <motion.div style={{ y: nameY }}>
+        <motion.div
+          className="flex items-center whitespace-nowrap"
+          animate={marqueeActive ? { x: ["0%", "-16.666%"] } : { x: "0%" }}
+          transition={marqueeActive ? { duration: 80, repeat: Infinity, ease: "linear" } : { duration: 0.4 }}
+        >
+          {NAME_REPEAT.map((name, i) => (
+            <span
+              key={`main-${i}`}
+              className="shrink-0 inline-block"
+              style={{
+                fontFamily: DOTO,
+                fontWeight: 400,
+                fontSize: "clamp(3.75rem, 18vw, 13rem)",
+                letterSpacing: "0.04em",
+                lineHeight: 0.86,
+                color:
+                  i % 2 === 0
+                    ? "rgba(252,18,53,0.24)"
+                    : "rgba(252,18,53,0.18)",
+                paddingRight: "clamp(2rem, 5vw, 5rem)",
+              }}
+            >
+              {name}
+            </span>
+          ))}
+        </motion.div>
+
+        <motion.div
+          className="flex items-center whitespace-nowrap -mt-2 sm:-mt-3 md:-mt-6"
+          animate={marqueeActive ? { x: ["-16.666%", "0%"] } : { x: "-16.666%" }}
+          transition={marqueeActive ? { duration: 110, repeat: Infinity, ease: "linear" } : { duration: 0.4 }}
+        >
+          {NAME_REPEAT.map((name, i) => (
+            <span
+              key={`sub-${i}`}
+              className="shrink-0 inline-block"
+              style={{
+                fontFamily: DOTO,
+                fontWeight: 400,
+                fontSize: "clamp(3.75rem, 18vw, 13rem)",
+                letterSpacing: "0.04em",
+                lineHeight: 0.86,
+                color: i % 2 === 0
+                  ? "rgba(252,18,53,0.74)"
+                  : "rgba(252,18,53,0.58)",
+                paddingRight: "clamp(2rem, 5vw, 5rem)",
+              }}
+            >
+              {name}
+            </span>
+          ))}
+        </motion.div>
+      </motion.div>
+    </div>
+  );
+}
+
+export function Footer({
+  disableSignatureParallax = false,
+  disableEmailMailto = false,
+}: {
+  disableSignatureParallax?: boolean;
+  disableEmailMailto?: boolean;
+} = {}) {
+  const sectionRef = useRef<HTMLElement>(null);
+  const isInView = useInView(sectionRef, { once: false, margin: "-60px" });
+  const hasEnteredView = useInView(sectionRef, { once: true, margin: "-60px" });
+  const [isPageVisible, setIsPageVisible] = useState(true);
+  const prefersReducedMotion = useReducedMotion();
   const marqueeActive = isInView && isPageVisible && !prefersReducedMotion;
 
   useEffect(() => {
@@ -347,8 +434,42 @@ export function Footer() {
               <DownloadCVCTA />
 
               {/* Email en "secondary link" */}
+              {disableEmailMailto ? (
+              <span
+                className="group relative inline-flex max-w-full items-center gap-2 self-start break-all sm:self-center sm:break-normal"
+                style={{ textDecoration: "none" }}
+                aria-label="Email : bilongevans@gmail.com"
+              >
+                <span
+                  style={{
+                    fontFamily: SANS,
+                    fontSize: "clamp(0.92rem, 2.3vw, 0.96rem)",
+                    fontWeight: 500,
+                    letterSpacing: "-0.005em",
+                    color: "#D0D0D0",
+                  }}
+                  className="transition-colors duration-300 group-hover:text-white"
+                >
+                  bilongevans@gmail.com
+                </span>
+                <span
+                  aria-hidden="true"
+                  style={{
+                    position: "absolute",
+                    left: 0,
+                    right: 0,
+                    bottom: "-3px",
+                    height: "1px",
+                    background:
+                      "linear-gradient(90deg, #FC1235, rgba(252,18,53,0))",
+                    transformOrigin: "left center",
+                  }}
+                  className="scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                />
+              </span>
+              ) : (
               <a
-                href="mailto:bilongevans@gmail.com"
+                href="/contact"
                 className="group relative inline-flex max-w-full items-center gap-2 self-start break-all sm:self-center sm:break-normal"
                 style={{ textDecoration: "none" }}
               >
@@ -379,6 +500,7 @@ export function Footer() {
                   className="scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
                 />
               </a>
+              )}
             </div>
           </motion.div>
 
@@ -427,64 +549,11 @@ export function Footer() {
       {/* ══════════════════════════════════════════════════════
           SIGNATURE GÉANTE — EVANS BILONG (marquee + parallax)
       ══════════════════════════════════════════════════════ */}
-      <div
-        className="relative mt-16 sm:mt-20 lg:mt-32 overflow-hidden select-none pointer-events-none"
-      >
-        <motion.div style={{ y: nameY }}>
-          <motion.div
-            className="flex items-center whitespace-nowrap"
-            animate={marqueeActive ? { x: ["0%", "-16.666%"] } : { x: "0%" }}
-            transition={marqueeActive ? { duration: 80, repeat: Infinity, ease: "linear" } : { duration: 0.4 }}
-          >
-            {NAME_REPEAT.map((name, i) => (
-              <span
-                key={`main-${i}`}
-                className="shrink-0 inline-block"
-                style={{
-                  fontFamily: DOTO,
-                  fontWeight: 400,
-                  fontSize: "clamp(3.75rem, 18vw, 13rem)",
-                  letterSpacing: "0.04em",
-                  lineHeight: 0.86,
-                  color:
-                    i % 2 === 0
-                      ? "rgba(252,18,53,0.24)"
-                      : "rgba(252,18,53,0.18)",
-                  paddingRight: "clamp(2rem, 5vw, 5rem)",
-                }}
-              >
-                {name}
-              </span>
-            ))}
-          </motion.div>
-
-          <motion.div
-            className="flex items-center whitespace-nowrap -mt-2 sm:-mt-3 md:-mt-6"
-            animate={marqueeActive ? { x: ["-16.666%", "0%"] } : { x: "-16.666%" }}
-            transition={marqueeActive ? { duration: 110, repeat: Infinity, ease: "linear" } : { duration: 0.4 }}
-          >
-            {NAME_REPEAT.map((name, i) => (
-              <span
-                key={`sub-${i}`}
-                className="shrink-0 inline-block"
-                style={{
-                  fontFamily: DOTO,
-                  fontWeight: 400,
-                  fontSize: "clamp(3.75rem, 18vw, 13rem)",
-                  letterSpacing: "0.04em",
-                  lineHeight: 0.86,
-                  color: i % 2 === 0
-                    ? "rgba(252,18,53,0.74)"
-                    : "rgba(252,18,53,0.58)",
-                  paddingRight: "clamp(2rem, 5vw, 5rem)",
-                }}
-              >
-                {name}
-              </span>
-            ))}
-          </motion.div>
-        </motion.div>
-      </div>
+      {disableSignatureParallax ? (
+        <FooterSignatureContent marqueeActive={marqueeActive} />
+      ) : (
+        <FooterSignatureParallax sectionRef={sectionRef} marqueeActive={marqueeActive} />
+      )}
 
     </footer>
   );

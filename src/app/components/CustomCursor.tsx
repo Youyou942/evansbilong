@@ -155,7 +155,7 @@ function useIsTouch() {
 /* ═══════════════════════════════════════════════════════════
    COMPOSANT
 ═══════════════════════════════════════════════════════════ */
-export function CustomCursor() {
+export function CustomCursor({ sleepWhenIdle = false }: { sleepWhenIdle?: boolean } = {}) {
   const location = useLocation();
   const isProjectDetailRoute = location.pathname.startsWith("/projects/");
   const isTouch  = useIsTouch();
@@ -182,12 +182,16 @@ export function CustomCursor() {
     const posTrail = { x: -200, y: -200 };
     let raf = 0;
     let running = false;
+    let hasPointer = !sleepWhenIdle;
+    let lastHoverTarget: EventTarget | null = null;
 
     const onMove = (e: MouseEvent) => {
       target.x = e.clientX;
       target.y = e.clientY;
+      hasPointer = true;
 
-      if (_explicit === "default") {
+      if (_explicit === "default" && e.target !== lastHoverTarget) {
+        lastHoverTarget = e.target;
         const el = e.target as HTMLElement | null;
         const isInteractive = !!(el && el.closest(INTERACTIVE_SELECTOR));
         if (isInteractive !== _autoHover) {
@@ -195,6 +199,8 @@ export function CustomCursor() {
           emit();
         }
       }
+
+      if (sleepWhenIdle) start();
     };
 
     const tick = () => {
@@ -210,18 +216,29 @@ export function CustomCursor() {
       if (trailRef.current)
         trailRef.current.style.transform = `translate3d(${posTrail.x}px, ${posTrail.y}px, 0)`;
 
+      if (sleepWhenIdle) {
+        const mainSettled = Math.abs(target.x - posMain.x) < 0.08 && Math.abs(target.y - posMain.y) < 0.08;
+        const trailSettled = Math.abs(target.x - posTrail.x) < 0.08 && Math.abs(target.y - posTrail.y) < 0.08;
+        if (mainSettled && trailSettled) {
+          running = false;
+          raf = 0;
+          return;
+        }
+      }
+
       raf = requestAnimationFrame(tick);
     };
 
     const start = () => {
-      if (running || document.hidden) return;
+      if (running || document.hidden || !hasPointer) return;
       running = true;
       raf = requestAnimationFrame(tick);
     };
 
     const stop = () => {
       running = false;
-      cancelAnimationFrame(raf);
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0;
     };
 
     const onVisibilityChange = () => {
@@ -241,7 +258,7 @@ export function CustomCursor() {
       document.removeEventListener("visibilitychange", onVisibilityChange);
       stop();
     };
-  }, [isTouch, prefersReducedMotion]);
+  }, [isTouch, prefersReducedMotion, sleepWhenIdle]);
 
   /* Sur mobile/touch, on ne rend rien */
   if (isTouch || prefersReducedMotion) return null;

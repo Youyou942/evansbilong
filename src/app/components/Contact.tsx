@@ -29,7 +29,7 @@ function PrimaryCTA() {
   const [hovered, setHovered] = useState(false);
   return (
     <motion.a
-      href="mailto:bilongevans@gmail.com"
+      href="/contact"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       whileTap={{ scale: 0.985 }}
@@ -325,7 +325,7 @@ export function Contact() {
                 Email direct
               </span>
               <a
-                href="mailto:bilongevans@gmail.com"
+                href="/contact"
                 className="group relative inline-block break-all sm:break-normal"
                 style={{ textDecoration: "none" }}
               >

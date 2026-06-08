@@ -10,11 +10,8 @@ import { ProjectShinyButton } from "../components/ui/project-shiny-button";
 const SANS = "'Space Grotesk', sans-serif";
 const MONO = "'JetBrains Mono', monospace";
 const ACCENT = "#FC1235";
-const MAIL_SUBJECT = "Projet — Evans Bilong";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const FORMSPREE_ENDPOINT = (
-  ((import.meta as unknown as { env?: Record<string, string | undefined> }).env?.VITE_FORMSPREE_ENDPOINT) ?? ""
-).trim();
+const CONTACT_API_ENDPOINT = "/api/contact";
 
 const PRICING_ITEMS = [
   { label: "Landing page", price: "à partir de 600 €" },
@@ -29,11 +26,6 @@ type FormValues = {
 };
 
 type FormErrors = Partial<Record<keyof FormValues, string>>;
-
-function buildMailtoUrl({ nom, email, message }: FormValues) {
-  const body = encodeURIComponent(`Nom : ${nom}\nEmail : ${email}\n\nMessage :\n${message}`);
-  return `mailto:bilongevans@gmail.com?subject=${encodeURIComponent(MAIL_SUBJECT)}&body=${body}`;
-}
 
 function PricingBlock() {
   return (
@@ -142,6 +134,7 @@ function PricingBlock() {
 
 function ContactForm() {
   const [values, setValues] = useState<FormValues>({ nom: "", email: "", message: "" });
+  const [honeypot, setHoneypot] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState("");
@@ -171,21 +164,15 @@ function ContactForm() {
     if (!email.trim()) nextErrors.email = "Indiquez votre email.";
     else if (!EMAIL_RE.test(email.trim())) nextErrors.email = "Entrez une adresse email valide.";
     if (!message.trim()) nextErrors.message = "Décrivez votre besoin.";
+    else if (message.trim().length < 10) nextErrors.message = "Votre message doit contenir au moins 10 caractères.";
 
     return nextErrors;
   };
 
-  const openMailtoFallback = (formValues: FormValues) => {
-    setFeedbackTone("success");
-    setFeedback("Votre message est prêt.");
-
-    window.setTimeout(() => {
-      window.location.href = buildMailtoUrl(formValues);
-    }, 0);
-  };
-
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (isSubmitting) return;
 
     const formValues: FormValues = {
       nom: values.nom.trim(),
@@ -202,55 +189,83 @@ function ContactForm() {
       return;
     }
 
+    if (honeypot.trim()) {
+      setValues({ nom: "", email: "", message: "" });
+      setHoneypot("");
+      setFeedbackTone("success");
+      setFeedback("Message envoyé ✓");
+      return;
+    }
+
     setErrors({});
     setFeedback("");
     setFeedbackTone(null);
     setIsSubmitting(true);
 
-    if (!FORMSPREE_ENDPOINT) {
-      openMailtoFallback(formValues);
-      setIsSubmitting(false);
-      return;
-    }
-
     try {
-      const payload = new FormData();
-      payload.append("nom", formValues.nom);
-      payload.append("email", formValues.email);
-      payload.append("message", formValues.message);
-      payload.append("_subject", MAIL_SUBJECT);
-
-      const response = await fetch(FORMSPREE_ENDPOINT, {
+      const response = await fetch(CONTACT_API_ENDPOINT, {
         method: "POST",
-        headers: { Accept: "application/json" },
-        body: payload,
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        redirect: "error",
+        body: JSON.stringify({
+          nom: formValues.nom,
+          email: formValues.email,
+          message: formValues.message,
+          botcheck: honeypot,
+        }),
       });
 
-      const result = await response.json().catch(() => null);
-
       if (!response.ok) {
-        const serverMessage =
-          Array.isArray(result?.errors) && typeof result.errors[0]?.message === "string"
-            ? result.errors[0].message
-            : "Une erreur est survenue. Réessayez ou envoyez-moi un email.";
-
         setFeedbackTone("error");
-        setFeedback(serverMessage);
+        setFeedback("Une erreur est survenue. Réessayez.");
         return;
       }
 
       setValues({ nom: "", email: "", message: "" });
+      setHoneypot("");
       setFeedbackTone("success");
-      setFeedback("Message envoyé.");
+      setFeedback("Message envoyé ✓");
     } catch {
-      openMailtoFallback(formValues);
+      setFeedbackTone("error");
+      setFeedback("Une erreur est survenue. Réessayez.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const buttonLabel = isSubmitting
+    ? "Envoi en cours..."
+    : feedbackTone === "success"
+      ? "Message envoyé ✓"
+      : "Envoyer le message";
+
   return (
     <form onSubmit={handleSubmit} noValidate style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          left: "-9999px",
+          width: "1px",
+          height: "1px",
+          overflow: "hidden",
+        }}
+      >
+        <label htmlFor="contact-company">Entreprise</label>
+        <input
+          id="contact-company"
+          name="_gotcha"
+          type="text"
+          value={honeypot}
+          onChange={(event) => setHoneypot(event.target.value)}
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </div>
+
       <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
         <label
           htmlFor="contact-nom"
@@ -271,12 +286,17 @@ function ContactForm() {
           value={values.nom}
           onChange={(event) => updateField("nom", event.target.value)}
           aria-invalid={Boolean(errors.nom)}
+          aria-describedby={errors.nom ? "contact-nom-error" : undefined}
+          required
+          autoComplete="name"
           className="w-full rounded-[20px] border border-white/10 bg-white/[0.03] px-5 py-4 text-white outline-none transition-all duration-300 placeholder:text-white/25 focus:border-[#FC1235]/60 focus:bg-[#FC1235]/[0.04] focus:ring-2 focus:ring-[#FC1235]/10"
           placeholder="Votre nom"
           style={{ fontFamily: SANS, fontSize: "1rem", letterSpacing: "-0.01em" }}
         />
         {errors.nom && (
           <span
+            id="contact-nom-error"
+            role="alert"
             style={{
               fontFamily: MONO,
               fontSize: "0.46rem",
@@ -310,12 +330,17 @@ function ContactForm() {
           value={values.email}
           onChange={(event) => updateField("email", event.target.value)}
           aria-invalid={Boolean(errors.email)}
+          aria-describedby={errors.email ? "contact-email-error" : undefined}
+          required
+          autoComplete="email"
           className="w-full rounded-[20px] border border-white/10 bg-white/[0.03] px-5 py-4 text-white outline-none transition-all duration-300 placeholder:text-white/25 focus:border-[#FC1235]/60 focus:bg-[#FC1235]/[0.04] focus:ring-2 focus:ring-[#FC1235]/10"
           placeholder="vous@entreprise.com"
           style={{ fontFamily: SANS, fontSize: "1rem", letterSpacing: "-0.01em" }}
         />
         {errors.email && (
           <span
+            id="contact-email-error"
+            role="alert"
             style={{
               fontFamily: MONO,
               fontSize: "0.46rem",
@@ -348,6 +373,8 @@ function ContactForm() {
           value={values.message}
           onChange={(event) => updateField("message", event.target.value)}
           aria-invalid={Boolean(errors.message)}
+          aria-describedby={errors.message ? "contact-message-error" : undefined}
+          required
           rows={6}
           className="w-full rounded-[20px] border border-white/10 bg-white/[0.03] px-5 py-4 text-white outline-none transition-all duration-300 placeholder:text-white/25 focus:border-[#FC1235]/60 focus:bg-[#FC1235]/[0.04] focus:ring-2 focus:ring-[#FC1235]/10"
           placeholder="Décrivez votre besoin."
@@ -362,6 +389,8 @@ function ContactForm() {
         />
         {errors.message && (
           <span
+            id="contact-message-error"
+            role="alert"
             style={{
               fontFamily: MONO,
               fontSize: "0.46rem",
@@ -377,6 +406,8 @@ function ContactForm() {
 
       {feedback && (
         <p
+          aria-live="polite"
+          role={feedbackTone === "error" ? "alert" : "status"}
           style={{
             margin: 0,
             fontFamily: MONO,
@@ -408,7 +439,7 @@ function ContactForm() {
           </svg>
         }
       >
-        Envoyer le message
+        {buttonLabel}
       </ProjectShinyButton>
     </form>
   );
@@ -426,7 +457,7 @@ export function ContactPage() {
 
   return (
     <div className="min-h-screen bg-black overflow-x-hidden" style={{ fontFamily: SANS }}>
-      <CustomCursor />
+      <CustomCursor sleepWhenIdle />
       <StickyNav />
 
       <main>
@@ -448,8 +479,7 @@ export function ContactPage() {
               width: "560px",
               height: "320px",
               transform: "translateX(-50%)",
-              background: "radial-gradient(ellipse, rgba(252,18,53,0.08) 0%, transparent 68%)",
-              filter: "blur(56px)",
+              background: "radial-gradient(ellipse, rgba(252,18,53,0.055) 0%, rgba(252,18,53,0.022) 34%, transparent 72%)",
               pointerEvents: "none",
             }}
           />
@@ -493,7 +523,7 @@ export function ContactPage() {
         </section>
       </main>
 
-      <Footer />
+      <Footer disableSignatureParallax disableEmailMailto />
     </div>
   );
 }

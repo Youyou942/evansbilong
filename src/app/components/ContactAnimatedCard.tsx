@@ -50,34 +50,33 @@ export function ContactAnimatedCard({ children, className }: ContactAnimatedCard
           aria-hidden="true"
           className="pointer-events-none absolute -inset-[1px] rounded-[30px]"
           animate={{
-            boxShadow: isActive ? [
-              "0 0 0 1px rgba(252,18,53,0.09), 0 24px 60px rgba(0,0,0,0.46)",
-              "0 0 0 1px rgba(252,18,53,0.13), 0 28px 70px rgba(0,0,0,0.5)",
-              "0 0 0 1px rgba(252,18,53,0.09), 0 24px 60px rgba(0,0,0,0.46)",
-            ] : "0 0 0 1px rgba(252,18,53,0.09), 0 24px 60px rgba(0,0,0,0.46)",
+            opacity: isActive ? [0.92, 1, 0.92] : 0.92,
           }}
           transition={isActive ? { duration: 9, repeat: Infinity, ease: "easeInOut" } : { duration: 0.4 }}
+          style={{
+            boxShadow: "0 0 0 1px rgba(252,18,53,0.1), 0 24px 60px rgba(0,0,0,0.46)",
+          }}
         />
 
         <div className="pointer-events-none absolute -inset-[1px] overflow-hidden rounded-[30px]">
           <motion.div
-            className="absolute left-[-40%] top-0 h-px w-[34%] bg-gradient-to-r from-transparent via-[#FC1235] to-transparent opacity-52 blur-[0.8px]"
-            animate={isActive ? { left: ["-40%", "106%"] } : { left: "-40%" }}
+            className="absolute left-0 top-0 h-px w-[34%] bg-gradient-to-r from-transparent via-[#FC1235] to-transparent opacity-52 blur-[0.8px]"
+            animate={isActive ? { x: ["-120%", "315%"] } : { x: "-120%" }}
             transition={isActive ? { duration: 5.8, repeat: Infinity, ease: "easeInOut" } : { duration: 0.4 }}
           />
           <motion.div
-            className="absolute right-0 top-[-42%] h-[34%] w-px bg-gradient-to-b from-transparent via-[#FC1235] to-transparent opacity-44 blur-[0.8px]"
-            animate={isActive ? { top: ["-42%", "106%"] } : { top: "-42%" }}
+            className="absolute right-0 top-0 h-[34%] w-px bg-gradient-to-b from-transparent via-[#FC1235] to-transparent opacity-44 blur-[0.8px]"
+            animate={isActive ? { y: ["-125%", "315%"] } : { y: "-125%" }}
             transition={isActive ? { duration: 5.8, repeat: Infinity, ease: "easeInOut", delay: 1.45 } : { duration: 0.4 }}
           />
           <motion.div
-            className="absolute bottom-0 right-[-40%] h-px w-[34%] bg-gradient-to-r from-transparent via-[#FC1235] to-transparent opacity-52 blur-[0.8px]"
-            animate={isActive ? { right: ["-40%", "106%"] } : { right: "-40%" }}
+            className="absolute bottom-0 right-0 h-px w-[34%] bg-gradient-to-r from-transparent via-[#FC1235] to-transparent opacity-52 blur-[0.8px]"
+            animate={isActive ? { x: ["120%", "-315%"] } : { x: "120%" }}
             transition={isActive ? { duration: 5.8, repeat: Infinity, ease: "easeInOut", delay: 2.9 } : { duration: 0.4 }}
           />
           <motion.div
-            className="absolute bottom-[-42%] left-0 h-[34%] w-px bg-gradient-to-b from-transparent via-[#FC1235] to-transparent opacity-44 blur-[0.8px]"
-            animate={isActive ? { bottom: ["-42%", "106%"] } : { bottom: "-42%" }}
+            className="absolute bottom-0 left-0 h-[34%] w-px bg-gradient-to-b from-transparent via-[#FC1235] to-transparent opacity-44 blur-[0.8px]"
+            animate={isActive ? { y: ["125%", "-315%"] } : { y: "125%" }}
             transition={isActive ? { duration: 5.8, repeat: Infinity, ease: "easeInOut", delay: 4.35 } : { duration: 0.4 }}
           />
         </div>

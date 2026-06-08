@@ -96,6 +96,7 @@ export function ContactBeamsBackground({
   const beamsRef = useRef<Beam[]>([]);
   const animationFrameRef = useRef<number | null>(null);
   const sizeRef = useRef({ width: 0, height: 0, isMobile: false });
+  const lastFrameTimeRef = useRef(0);
   const [isActive, setIsActive] = useState(false);
 
   useEffect(() => {
@@ -140,9 +141,9 @@ export function ContactBeamsBackground({
       const rect = parent.getBoundingClientRect();
       const width = Math.max(1, rect.width);
       const height = Math.max(1, rect.height);
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       const isMobile = width < 640;
-      const beamCount = width < 430 ? 0 : isMobile ? 3 : width < 1024 ? 6 : 9;
+      const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1 : 1.25);
+      const beamCount = width < 430 ? 0 : isMobile ? 2 : width < 1024 ? 4 : 6;
 
       canvas.width = Math.floor(width * dpr);
       canvas.height = Math.floor(height * dpr);
@@ -160,12 +161,18 @@ export function ContactBeamsBackground({
       }
     };
 
-    const animate = () => {
+    const animate = (time = 0) => {
       const { width, height, isMobile } = sizeRef.current;
       if (!width || !height) return;
 
+      const targetFrameMs = isMobile ? 1000 / 20 : 1000 / 30;
+      if (time - lastFrameTimeRef.current < targetFrameMs) {
+        animationFrameRef.current = requestAnimationFrame(animate);
+        return;
+      }
+      lastFrameTimeRef.current = time;
+
       ctx.clearRect(0, 0, width, height);
-      ctx.filter = isMobile ? "blur(44px)" : "blur(58px)";
       ctx.globalCompositeOperation = "screen";
 
       const totalBeams = beamsRef.current.length;
@@ -198,6 +205,8 @@ export function ContactBeamsBackground({
       if (animationFrameRef.current !== null) {
         cancelAnimationFrame(animationFrameRef.current);
       }
+      animationFrameRef.current = null;
+      lastFrameTimeRef.current = 0;
     };
   }, [intensity, isActive]);
 
@@ -212,7 +221,7 @@ export function ContactBeamsBackground({
     >
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 opacity-[0.10] sm:opacity-[0.15]"
+        className="absolute inset-0 opacity-[0.08] sm:opacity-[0.13]"
       />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(252,18,53,0.045),rgba(18,0,5,0.025)_36%,transparent_66%)] sm:hidden" />
       <motion.div
@@ -223,7 +232,10 @@ export function ContactBeamsBackground({
           ease: "easeInOut",
           repeat: Number.POSITIVE_INFINITY,
         } : { duration: 0.4 }}
-        style={{ backdropFilter: "blur(48px)" }}
+        style={{
+          background:
+            "radial-gradient(circle at 50% 42%, rgba(252,18,53,0.035), rgba(18,0,5,0.02) 38%, transparent 68%)",
+        }}
       />
       <div className="absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-black to-transparent" />
       <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-black to-transparent" />
