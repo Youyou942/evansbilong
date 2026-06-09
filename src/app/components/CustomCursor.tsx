@@ -44,6 +44,8 @@ const MONO = "'JetBrains Mono', monospace";
 /* ─── Sélecteur éléments interactifs (auto-hover) ───────── */
 const INTERACTIVE_SELECTOR =
   'a, button, [role="button"], input, textarea, select, label[for], [data-cursor-hover]';
+const TEXT_INPUT_SELECTOR =
+  'input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]), textarea, [contenteditable="true"]';
 
 const SITE_STAR_PATH =
   "M13 2L15.7 10.3L24 13L15.7 15.7L13 24L10.3 15.7L2 13L10.3 10.3L13 2Z";
@@ -162,6 +164,7 @@ export function CustomCursor({ sleepWhenIdle = false }: { sleepWhenIdle?: boolea
   const prefersReducedMotion = useReducedMotion();
   const mainRef  = useRef<HTMLDivElement>(null);
   const trailRef = useRef<HTMLDivElement>(null);
+  const [isTextInputTarget, setIsTextInputTarget] = useState(false);
   const state = useEffective(isProjectDetailRoute);
   const spec  = SPECS[state];
 
@@ -193,7 +196,11 @@ export function CustomCursor({ sleepWhenIdle = false }: { sleepWhenIdle?: boolea
       if (_explicit === "default" && e.target !== lastHoverTarget) {
         lastHoverTarget = e.target;
         const el = e.target as HTMLElement | null;
+        const isTextInput = !!(el && el.closest(TEXT_INPUT_SELECTOR));
         const isInteractive = !!(el && el.closest(INTERACTIVE_SELECTOR));
+
+        setIsTextInputTarget(isTextInput);
+
         if (isInteractive !== _autoHover) {
           _autoHover = isInteractive;
           emit();
@@ -262,6 +269,7 @@ export function CustomCursor({ sleepWhenIdle = false }: { sleepWhenIdle?: boolea
 
   /* Sur mobile/touch, on ne rend rien */
   if (isTouch || prefersReducedMotion) return null;
+  if (isTextInputTarget) return null;
 
   return (
     <>

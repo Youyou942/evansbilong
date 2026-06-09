@@ -11,7 +11,9 @@ const SANS = "'Space Grotesk', sans-serif";
 const MONO = "'JetBrains Mono', monospace";
 const ACCENT = "#FC1235";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const CONTACT_API_ENDPOINT = "/api/contact";
+const WEB3FORMS_ENDPOINT = "https://api.web3forms.com/submit";
+const WEB3FORMS_ACCESS_KEY = "b4a797af-fc9e-45c9-a180-17ffa74bc745";
+const WEB3FORMS_SUBJECT = "Nouveau message depuis le portfolio d'Evans";
 
 const PRICING_ITEMS = [
   { label: "Landing page", price: "à partir de 600 €" },
@@ -26,6 +28,11 @@ type FormValues = {
 };
 
 type FormErrors = Partial<Record<keyof FormValues, string>>;
+
+type ContactApiResponse = {
+  success?: boolean;
+  message?: string;
+};
 
 function PricingBlock() {
   return (
@@ -189,36 +196,36 @@ function ContactForm() {
       return;
     }
 
-    if (honeypot.trim()) {
-      setValues({ nom: "", email: "", message: "" });
-      setHoneypot("");
-      setFeedbackTone("success");
-      setFeedback("Message envoyé ✓");
-      return;
-    }
-
     setErrors({});
     setFeedback("");
     setFeedbackTone(null);
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(CONTACT_API_ENDPOINT, {
+      const response = await fetch(WEB3FORMS_ENDPOINT, {
         method: "POST",
         headers: {
-          Accept: "application/json",
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
-        redirect: "error",
         body: JSON.stringify({
-          nom: formValues.nom,
+          access_key: WEB3FORMS_ACCESS_KEY,
+          name: formValues.nom,
           email: formValues.email,
           message: formValues.message,
+          subject: WEB3FORMS_SUBJECT,
           botcheck: honeypot,
         }),
       });
 
-      if (!response.ok) {
+      const result = (await response.json().catch(() => null)) as ContactApiResponse | null;
+
+      if (!response.ok || result?.success !== true) {
+        console.error("[contact-form] Web3Forms submission failed", {
+          status: response.status,
+          response: result,
+        });
+
         setFeedbackTone("error");
         setFeedback("Une erreur est survenue. Réessayez.");
         return;
@@ -228,7 +235,8 @@ function ContactForm() {
       setHoneypot("");
       setFeedbackTone("success");
       setFeedback("Message envoyé ✓");
-    } catch {
+    } catch (error) {
+      console.error("[contact-form] Network error", error);
       setFeedbackTone("error");
       setFeedback("Une erreur est survenue. Réessayez.");
     } finally {
@@ -257,7 +265,7 @@ function ContactForm() {
         <label htmlFor="contact-company">Entreprise</label>
         <input
           id="contact-company"
-          name="_gotcha"
+          name="botcheck"
           type="text"
           value={honeypot}
           onChange={(event) => setHoneypot(event.target.value)}
