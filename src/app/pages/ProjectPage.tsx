@@ -415,9 +415,13 @@ function OpeningShot({ project }: { project: Project }) {
   const prefersReducedMotion = useReducedMotion();
   const openingImage = getProjectPageImages(project)[0];
   const openingAspect = getAspectValue(openingImage?.aspect ?? "16 / 9");
-  const openingHeight = openingImage?.objectFit === "contain"
+  const defaultOpeningHeight = openingImage?.objectFit === "contain"
     ? `min(calc(100vw / ${openingAspect}), 840px)`
     : "min(86vh, 840px)";
+  const openingHeight =
+    project.slug === "videos" && !isDesktop && openingImage?.objectFit !== "contain"
+      ? "clamp(380px, 58vh, 520px)"
+      : defaultOpeningHeight;
 
   /* Parallaxe très subtil — ±4 % seulement */
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
