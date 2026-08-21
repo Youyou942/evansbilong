@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Play, X } from "lucide-react";
 import { motion, useInView } from "motion/react";
 import type { ProjectVideo } from "../data/projects";
@@ -229,15 +229,27 @@ function VideoLightbox({
   onClose: () => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const stopVideo = useCallback(() => {
+    const videoElement = videoRef.current;
+    if (!videoElement) return;
+
+    videoElement.pause();
+    videoElement.currentTime = 0;
+  }, []);
+
+  const handleClose = useCallback(() => {
+    stopVideo();
+    onClose();
+  }, [onClose, stopVideo]);
 
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") handleClose();
     };
 
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [onClose]);
+  }, [handleClose]);
 
   useEffect(() => {
     const { body, documentElement } = document;
@@ -248,9 +260,34 @@ function VideoLightbox({
     documentElement.style.overflow = "hidden";
 
     return () => {
-      videoRef.current?.pause();
+      stopVideo();
       body.style.overflow = previousBodyOverflow;
       documentElement.style.overflow = previousHtmlOverflow;
+    };
+  }, [stopVideo, video.src]);
+
+  useEffect(() => {
+    const videoElement = videoRef.current;
+    if (!videoElement) return;
+
+    const playSelectedVideo = () => {
+      const playAttempt = videoElement.play();
+      if (playAttempt) {
+        playAttempt.catch(() => {
+          // If the browser blocks playback, controls stay visible for manual play.
+        });
+      }
+    };
+
+    videoElement.currentTime = 0;
+    videoElement.addEventListener("canplay", playSelectedVideo, { once: true });
+    videoElement.load();
+    playSelectedVideo();
+
+    return () => {
+      videoElement.removeEventListener("canplay", playSelectedVideo);
+      videoElement.pause();
+      videoElement.currentTime = 0;
     };
   }, [video.src]);
 
@@ -263,7 +300,7 @@ function VideoLightbox({
         minHeight: "100dvh",
         overscrollBehavior: "contain",
       }}
-      onClick={onClose}
+      onClick={handleClose}
       role="dialog"
       aria-modal="true"
       aria-label={`Lecteur vidéo ${video.title}`}
@@ -275,7 +312,7 @@ function VideoLightbox({
       >
         <button
           type="button"
-          onClick={onClose}
+          onClick={handleClose}
           aria-label="Fermer la vidéo"
           className="absolute right-2 top-2 z-10 flex h-10 w-10 items-center justify-center rounded-full transition-colors duration-300 md:-top-14 md:right-0"
           style={{
@@ -301,7 +338,7 @@ function VideoLightbox({
             key={video.src}
             controls
             playsInline
-            preload="none"
+            preload="metadata"
             poster={video.poster}
             className="block h-auto w-full"
             style={{ maxHeight: "calc(100dvh - 8rem)", backgroundColor: "#000000" }}
