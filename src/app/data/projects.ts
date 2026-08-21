@@ -27,11 +27,19 @@ export type Project = {
   tags: ProjectTag[];
   externalUrl?: string;
   role: string;
+  videos?: ProjectVideo[];
   caseStudy: {
     problem: string;
     solution: string;
     result: string;
   };
+};
+
+export type ProjectVideo = {
+  title: string;
+  src: string;
+  poster: string;
+  description: string;
 };
 
 export const PROJECTS: Project[] = [
@@ -118,6 +126,63 @@ export const PROJECTS: Project[] = [
         "Navigation clarifiée, écrans allégés, interactions plus directes. Un travail centré sur la lisibilité, la rapidité et la compréhension.",
       result:
         "La refonte simplifie l'usage sans perdre la richesse fonctionnelle de la plateforme.",
+    },
+  },
+  {
+    slug: "videos",
+    index: "04",
+    title: "Réalisations vidéo",
+    category: "Motion / Vidéo",
+    description: "Frames in Motion.",
+    image: "/videos/posters/esmod-2026-lyon.webp",
+    coverImage: "/videos/posters/esmod-2026-lyon.webp",
+    pageImages: [
+      {
+        src: "/videos/posters/esmod-2026-lyon.webp",
+        alt: "Réalisations vidéo — image de couverture",
+        aspect: "16 / 9",
+        objectFit: "cover",
+        objectPosition: "center",
+      },
+    ],
+    gallery: [],
+    objectPosition: "center",
+    year: "2025 / 2026",
+    tags: ["Montage vidéo", "Motion design", "Direction visuelle"],
+    role: "Montage vidéo · Motion design · Direction visuelle",
+    videos: [
+      {
+        title: "Falling Clip V2",
+        src: "/videos/falling-clip-v2.mp4",
+        poster: "/videos/posters/falling-clip-v2.webp",
+        description: "Rythme brut / chute contrôlée",
+      },
+      {
+        title: "This is real",
+        src: "/videos/this-is-real.mp4",
+        poster: "/videos/posters/this-is-real.webp",
+        description: "Motion tracking / réel déformé",
+      },
+      {
+        title: "ESMOD 2026 Lyon",
+        src: "/videos/esmod-2026-lyon.mp4",
+        poster: "/videos/posters/esmod-2026-lyon.webp",
+        description: "Défilé / énergie backstage",
+      },
+      {
+        title: "Tourner la page",
+        src: "/videos/tourner-la-page.mp4",
+        poster: "/videos/posters/tourner-la-page.webp",
+        description: "Ambiance noire / mouvement court",
+      },
+    ],
+    caseStudy: {
+      problem:
+        "Construire une séquence vidéo courte demande de trouver rapidement un rythme, une intention et une cohérence visuelle.",
+      solution:
+        "Le travail se concentre sur le montage, l'ambiance, les transitions et la direction de l'image pour donner une identité claire à chaque format.",
+      result:
+        "Chaque vidéo installe une atmosphère identifiable et montre une approche visuelle construite.",
     },
   },
 ];

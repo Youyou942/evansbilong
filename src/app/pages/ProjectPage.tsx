@@ -17,6 +17,7 @@ import { StickyNav } from "../components/StickyNav";
 import { CustomCursor, setCursorState } from "../components/CustomCursor";
 import { ProjectShinyButton } from "../components/ui/project-shiny-button";
 import { VideoPlayer } from "../components/ui/video-player";
+import { VideoProjectGallery } from "../components/VideoProjectGallery";
 
 /* ─── Design tokens ──────────────────────────────────────── */
 const MONO = "'JetBrains Mono', monospace";
@@ -96,6 +97,8 @@ export function ProjectPage() {
 
   if (!project) return <NotFound />;
 
+  const isVideoProject = project.slug === "videos";
+
   return (
     <div className="min-h-screen bg-black overflow-x-hidden" style={{ fontFamily: SANS }}>
       <CustomCursor />
@@ -103,14 +106,20 @@ export function ProjectPage() {
       <main>
         <Hero project={project} />
         <OpeningShot project={project} />
-        <CaseStudy project={project} />
-        {project.slug !== "japan-airlines" && <VisualFeature project={project} />}
-        {project.slug === "0xrui"
-          ? <OxruiGallery project={project} />
-          : project.slug === "japan-airlines"
-          ? <JapanGallery project={project} />
-          : <GalleryPair project={project} />
-        }
+        {isVideoProject ? (
+          <VideoProjectGallery videos={project.videos ?? []} />
+        ) : (
+          <>
+            <CaseStudy project={project} />
+            {project.slug !== "japan-airlines" && <VisualFeature project={project} />}
+            {project.slug === "0xrui"
+              ? <OxruiGallery project={project} />
+              : project.slug === "japan-airlines"
+              ? <JapanGallery project={project} />
+              : <GalleryPair project={project} />
+            }
+          </>
+        )}
         <LiveSite project={project} />
         <FooterNav prev={prev} next={next} />
       </main>
@@ -189,7 +198,7 @@ function Hero({ project }: { project: Project }) {
           {showVideoBtn && <VideoBtn onClick={() => setVideoOpen(true)} />}
           <div>
             <span style={{ fontFamily: MONO, fontSize: "0.44rem", color: "#555", letterSpacing: "0.3em", textTransform: "uppercase", display: "block", marginBottom: "0.65rem" }}>
-              {project.slug === "japan-airlines" ? "Outils" : "Services"}
+              {project.slug === "japan-airlines" ? "Outils" : project.slug === "videos" ? "Axes" : "Services"}
             </span>
             <div className="flex flex-wrap gap-1.5">
               {project.tags.map((tag) => (
